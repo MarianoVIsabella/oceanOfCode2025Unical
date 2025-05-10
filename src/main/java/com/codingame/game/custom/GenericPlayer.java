@@ -104,7 +104,7 @@ class GenericPlayer {
 
     // By Default, it tells to move north and not to use any powers
     protected void chooseAndPrintNextAction() {
-        System.out.println("MOVE N");
+        System.out.println("MOVE S");
         System.err.println(String.format(infoBaseString, playerName) + "Chosen Position by default Chooser");
     }
 }
