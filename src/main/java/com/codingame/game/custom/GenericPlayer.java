@@ -3,41 +3,58 @@ package com.codingame.game.custom;
 import java.util.*;
 
 /**
- * Auto-generated code below aims at helping you parse
- * the standard input according to the problem statement.
- **/
+    * Base Class for Input Parsing and Game Cycles Handling.
+    * It contains all the basic information to successfully compute a valid position to play the game
+**/
 class GenericPlayer {
 
-    protected class Statistics {
+    protected static class Statistics {
         // Current Player Stats
         public int positionX = -1, positionY = -1;
-        public int life = 6;
+        public int myLifeValue = 6;
 
         // Opponent Player Stats
-        public int opponentLife;
-        public int opponentOrders;
+        public int opponentLifeValue = 6;
+        public String opponentOrders = "NA";
 
         // Powers' Cooldown Values
-        public int torpedoCooldown, sonarCooldown, silenceCooldown, mineCooldown;
+        public int torpedoCooldown = -1,
+                    sonarCooldown = -1,
+                    silenceCooldown = -1,
+                    mineCooldown = -1;
 
         // Powers' Results
-        public int sonarResult;
-
+        public String sonarResult = "NA";
     }
 
-    protected static final String infoBaseString =  "----- [%s]";
+    // Grid Dimensions & Cells' info
+    protected int gridWidth, gridHeight;
+    protected boolean[][] gridCells;
+
+    // Player Id
+    protected int id;
+
+    // Game Statitics
+    protected Statistics stats;
+
+    protected static final String infoBaseString =  " ----- [%s]";
+    protected String playerName = "Generic Game Player";
 
     public static void main(String[] args) {
+        new GenericPlayer().handleGameCycles(args);
+    }
+
+    protected void handleGameCycles(String[] args) {
         Scanner in = new Scanner(System.in);
 
         // Read Game infos about Board and Player Id
-        int gridWidth = in.nextInt();
-        int gridHeight = in.nextInt();
-        int id = in.nextInt();
+        this.gridWidth = in.nextInt();
+        this.gridHeight = in.nextInt();
+        this.id = in.nextInt();
         if (in.hasNextLine()) in.nextLine();
 
         // Read Board from Console
-        boolean[][] gridCells = new boolean[gridWidth][gridHeight];
+        this.gridCells = new boolean[gridWidth][gridHeight];
         for (int i = 0; i < gridHeight; i++) {
             String line = in.nextLine();
 
@@ -45,45 +62,50 @@ class GenericPlayer {
         }
 
         // Choose Player's Initial Position
-        chooseAndPrintInitialPosition(gridWidth, gridHeight, gridCells);
+        this.chooseAndPrintInitialPosition();
 
-        // game loop
+        // Game loop
         while (true) {
 
             // Read info about the Current Game Round
-            int[] myPosition = new int[]{ in.nextInt(), in.nextInt() };
-            int myLifeValue = in.nextInt();
+            this.stats.positionX = in.nextInt(); this.stats.positionY = in.nextInt();
+            this.stats.myLifeValue = in.nextInt();
 
-            int myOpponentLifeValue = in.nextInt();
+            this.stats.opponentLifeValue = in.nextInt();
 
             // Powers' Cooldown Values
-            int torpedoCooldown = in.nextInt();
-            int sonarCooldown = in.nextInt();
-            int silenceCooldown = in.nextInt();
-            int mineCooldown = in.nextInt();
-            String sonarResult = in.next();
+            this.stats.torpedoCooldown = in.nextInt();
+            this.stats.sonarCooldown = in.nextInt();
+            this.stats.silenceCooldown = in.nextInt();
+            this.stats.mineCooldown = in.nextInt();
+            this.stats.sonarResult = in.next();
 
             if (in.hasNextLine()) in.nextLine();
 
             // Opponent's Last Message
-            String opponentOrders = in.nextLine();
+            this.stats.opponentOrders = in.nextLine();
 
-            // Write an action using System.out.println()
-            // To debug: System.err.println("Debug messages...");
-
-            System.out.println("MOVE N TORPEDO");
+            // Choose where to move next
+            this.chooseAndPrintNextAction();
         }
     }
 
     // By Default, it prints the first valid cell it finds looking row by row
-    protected static void chooseAndPrintInitialPosition(int gridWidth, int gridHeight, boolean[][] positionCells) {
-        for (int i = 0; i < gridHeight; i++)
-            for (int j = 0; j < gridWidth; j++)
-                if (positionCells[j][i]) {
+    protected void chooseAndPrintInitialPosition() {
+        for (int i = 0; i < this.gridHeight; i++)
+            for (int j = 0; j < this.gridWidth; j++)
+                if (this.gridCells[j][i]) {
                     System.out.print(i + " " + j);
-                    System.err.println(String.format(infoBaseString, "Generic Game Player") + "Chosen Position by default Chooser");
+                    System.err.println(String.format(infoBaseString, playerName) +
+                            "Chosen Position by default Chooser");
                     return;
                 }
+    }
+
+    // By Default, it tells to move north and not to use any powers
+    protected void chooseAndPrintNextAction() {
+        System.out.println("MOVE N");
+        System.err.println(String.format(infoBaseString, playerName) + "Chosen Position by default Chooser");
     }
 }
 
