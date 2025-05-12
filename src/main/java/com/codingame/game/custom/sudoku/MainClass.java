@@ -37,7 +37,7 @@ public class MainClass {
 		//Visualizziamo la griglia iniziale del Sudoku
 		displayMatrix();
 		
-		//Creazione dell'oggetto handler che si occuper‡ di gestire l'invocazione 
+		//Creazione dell'oggetto handler che si occuper√† di gestire l'invocazione
 		//del sistema ASP da utilizzare
 		
 		//Se si esegue la demo su Windows 64bit scommentare la seguente istruzione:
@@ -59,7 +59,7 @@ public class MainClass {
 		try {
 			ASPMapper.getInstance().registerClass(Cell.class);
 		} catch (ObjectNotValidException | IllegalAnnotationException e1) {
-			e1.printStackTrace();
+
 		}
 		InputProgram facts= new ASPInputProgram();
 		for(int i=0;i<N;i++){
@@ -86,14 +86,14 @@ public class MainClass {
 		
 		//L'handler invoca DLV2 in modo SINCRONO dando come input il programma logico e i fatti
 		Output o =  handler.startSync();
-		
-		//Analizziamo l'answer set che in quest caso Ë unico e che rappresenta la soluzione
+
+		//Analizziamo l'answer set che in quest caso ÔøΩ unico e che rappresenta la soluzione
 		//del Sudoku e aggiorniamo la matrice
 		AnswerSets answersets = (AnswerSets) o;
 		for(AnswerSet a:answersets.getAnswersets()){
 			try {
 				for(Object obj:a.getAtoms()){
-					//Scartiamo tutto ciÚ che non Ë un oggetto della classe Cell
+					//Scartiamo tutto ciÔøΩ che non ÔøΩ un oggetto della classe Cell
 					if(!(obj instanceof Cell)) continue;
 					//Convertiamo in un oggetto della classe Cell e impostiamo il valore di ogni cella 
 					//nella matrice rappresentante la griglia del Sudoku
@@ -101,14 +101,14 @@ public class MainClass {
 					sudokuMatrix[cell.getRow()][cell.getColumn()] = cell.getValue();
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+
 			} 
 			
 		}
-		//Visualizziamo la griglia cosÏ ottenuta
+		//Visualizziamo la griglia cosÔøΩ ottenuta
 		displayMatrix();
 		
-		//In alternativa l'handler puÚ invocare DLV2 in modo ASINCRONO.
+		//In alternativa l'handler puÔøΩ invocare DLV2 in modo ASINCRONO.
 		//Scommentare la seguente linea e commentare le linee 89-110
 		//handler.startAsync(new MyCallback(sudokuMatrix));
 	}

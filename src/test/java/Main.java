@@ -16,13 +16,13 @@ public class Main {
         if (null != cli1) {
             gameRunner.addAgent(cli1);
         } else {
-            gameRunner.addAgent(DummyPlayer.class);
+            gameRunner.addAgent(ASPplayer.class);
         }
         // add player 2
         if (null != cli2) {
             gameRunner.addAgent(cli2);
         } else {
-            gameRunner.addAgent(DummyPlayer.class);
+            gameRunner.addAgent(ASPplayer.class);
         }
         //gameRunner.addAgent(Player2.class);
 
