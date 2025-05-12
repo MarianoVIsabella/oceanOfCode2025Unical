@@ -6,9 +6,9 @@ import java.util.*;
     * Base Class for Input Parsing and Game Cycles Handling.
     * It contains all the basic information to successfully compute a valid position to play the game
 **/
-class GenericPlayer {
+public class GenericPlayer {
 
-    protected static class Statistics {
+    public class Statistics {
         // Current Player Stats
         public int positionX = -1, positionY = -1;
         public int myLifeValue = 6;
@@ -25,6 +25,7 @@ class GenericPlayer {
 
         // Powers' Results
         public String sonarResult = "NA";
+
     }
 
     // Grid Dimensions & Cells' info
@@ -63,6 +64,7 @@ class GenericPlayer {
 
         // Choose Player's Initial Position
         this.chooseAndPrintInitialPosition();
+        this.stats = new Statistics();
 
         // Game loop
         while (true) {

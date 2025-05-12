@@ -1,3 +1,4 @@
+import com.codingame.game.custom.GenericPlayer;
 import com.codingame.gameengine.runner.MultiplayerGameRunner;
 
 public class Main {
@@ -13,11 +14,12 @@ public class Main {
         gameRunner.setLeagueLevel(3);
         gameRunner.setSeed(1337L);
         // add player 1
-        if (null != cli1) {
-            gameRunner.addAgent(cli1);
-        } else {
-            gameRunner.addAgent(DummyPlayer.class);
-        }
+//        if (null != cli1) {
+//            gameRunner.addAgent(cli1);
+//        } else {
+//            gameRunner.addAgent(DummyPlayer.class);
+//        }
+        gameRunner.addAgent(GenericPlayer.class);
         // add player 2
         if (null != cli2) {
             gameRunner.addAgent(cli2);
