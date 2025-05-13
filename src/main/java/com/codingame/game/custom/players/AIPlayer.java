@@ -32,6 +32,9 @@ public class AIPlayer extends GenericPlayer {
         // Declaration of ASP Handler
         handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
 
+        //macOS
+        //handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2-macOS-64bit.mac_5"));
+
         // Inserting Predicate Classes into ASP Mapper
         try {
             ASPMapper.getInstance().registerClass(Move.class);
