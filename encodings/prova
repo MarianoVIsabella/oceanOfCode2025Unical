@@ -1,1 +1,17 @@
 move(n) | move(s) | move(e) | move(w).
+
+:- move(n), myPos(_, Y), Y=0.
+:- move(s), myPos(_, Y), Y=14.
+:- move(w), myPos(X, _), X=0.
+:- move(e), myPos(X, _), X=14.
+
+movingCell(X, Y-1) :- myPos(X, Y), move(n).
+movingCell(X, Y+1) :- myPos(X, Y), move(s).
+movingCell(X-1, Y) :- myPos(X, Y), move(w).
+movingCell(X+1, Y) :- myPos(X, Y), move(e).
+
+:- movingCell(X, Y), visitedCell(X, Y).
+
+:- movingCell(X, Y), not waterCell(X, Y).
+
+#show move/1.
