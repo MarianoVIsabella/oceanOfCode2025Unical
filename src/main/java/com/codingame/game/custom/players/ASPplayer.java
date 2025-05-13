@@ -38,6 +38,7 @@ public class ASPplayer {
 
         handler.addProgram(encoding);
 
+
         // inserire la condizione di fine gioco, no continua a richiamare dlv all'infinito
         // leggere dall'input i punti vita propri e dell'avversario (?)
         for (int i=0; i<6; i++) {

@@ -31,7 +31,7 @@ public class GenericPlayer {
 
     // Grid Dimensions & Cells' info
     protected int gridWidth, gridHeight;
-    protected boolean[][] gridCells;
+    protected int[][] gridCells;
 
     // Player Id
     protected int id;
@@ -54,15 +54,23 @@ public class GenericPlayer {
         if (in.hasNextLine()) in.nextLine();
 
         // Read Board from Console
-        this.gridCells = new boolean[gridWidth][gridHeight];
+        this.gridCells = new int[gridWidth][gridHeight];
+
         for (int i = 0; i < gridHeight; i++) {
             String line = in.nextLine();
 
-            for (int j = 0; j < gridWidth; j++) gridCells[i][j] = line.charAt(j) != 'X';
+            for (int j = 0; j < gridWidth; j++)
+                gridCells[i][j] = (line.charAt(j) == 'X') ? 2 : 0;
+
         }
 
-        // Choose Player's Initial Position
-        this.chooseAndPrintInitialPosition();
+        // Update Initial Internal State
+        this.updateInitialInternalState();
+
+        // Choose Player's Initial Position and Print it
+        List<Integer> initPos =  this.chooseInitialPosition();
+        System.out.printf("%d %d%n", initPos.get(0), initPos.get(1));
+
         this.stats = new Statistics();
 
         // Game loop
@@ -86,14 +94,22 @@ public class GenericPlayer {
             // Opponent's Last Message
             this.stats.opponentOrders = in.nextLine();
 
+            // Update Current Internal State
+            this.updateCurrentInternalState();
+
             // Choose where to move next
-            this.chooseAndPrintNextAction();
+            List<String> action = this.chooseNextAction();
+            printNextAction(action);
         }
     }
 
     // By Default, it prints the first valid cell it finds looking row by row
-    protected void chooseAndPrintInitialPosition() {
-        System.out.println("7 7"); return;
+    protected List<Integer> chooseInitialPosition() {
+        List<Integer> toRet = new ArrayList<>();
+
+        toRet.add(7); toRet.add(7);
+
+        return toRet;
 //        for (int i = 0; i < this.gridHeight; i++)
 //            for (int j = 0; j < this.gridWidth; j++)
 //                if (this.gridCells[i][j]) {
@@ -105,10 +121,21 @@ public class GenericPlayer {
     }
 
     // By Default, it tells to move north and not to use any powers
-    protected void chooseAndPrintNextAction() {
-        System.out.println("MOVE S");
+    protected List<String> chooseNextAction() {
+        List<String> toRet = new ArrayList<>();
+
+        toRet.add("MOVE S");
+
         System.err.println(String.format(infoBaseString, playerName) + "Chosen Position by default Chooser");
         System.err.println(gridWidth + "x" + gridHeight + " grid");
+
+        return toRet;
     }
+
+    // It helps to print out the next Aciton
+    private void printNextAction(List<String> action) {}
+
+    protected void updateInitialInternalState() {}
+    protected void updateCurrentInternalState() {}
 }
 
