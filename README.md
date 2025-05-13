@@ -10,6 +10,10 @@ Community contest for CodingGame, see [https://www.codingame.com/contests/ocean-
 
 * Maven 3.6.x.
 
+## Add to VM Option:
+
+* --add-opens java.base/java.lang=ALL-UNNAMED
+
 ### Follow the next steps respectively to run the game locally:
 
 1. Run `mvn clean install`. This bundles the game dependencies and tests in one jar file inside the target directory.
