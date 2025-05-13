@@ -1,16 +1,23 @@
 package com.codingame.game.custom.players;
 
 import com.codingame.game.custom.ASPclasses.Move;
+import com.codingame.game.custom.ASPclasses.Torpedo;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
+import it.unical.mat.embasp.base.OptionDescriptor;
+import it.unical.mat.embasp.base.Output;
 import it.unical.mat.embasp.languages.IllegalAnnotationException;
 import it.unical.mat.embasp.languages.ObjectNotValidException;
 import it.unical.mat.embasp.languages.asp.ASPInputProgram;
 import it.unical.mat.embasp.languages.asp.ASPMapper;
+import it.unical.mat.embasp.languages.asp.AnswerSet;
+import it.unical.mat.embasp.languages.asp.AnswerSets;
 import it.unical.mat.embasp.platforms.desktop.DesktopHandler;
 import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class AIPlayer extends GenericPlayer {
@@ -30,7 +37,11 @@ public class AIPlayer extends GenericPlayer {
 
     protected static StringBuilder sb;
 
-    public static void main(String[] args) { new AIPlayer().handleGameCycles(); }
+    public static void main(String[] args) {
+        init();
+
+        new AIPlayer().handleGameCycles();
+    }
 
     protected static void init() {
 
@@ -108,6 +119,66 @@ public class AIPlayer extends GenericPlayer {
 
     @Override
     protected List<String> chooseNextAction() {
-        return super.chooseNextAction();
+        handler.removeAll();
+
+        OptionDescriptor option = new OptionDescriptor("-n 0");
+        handler.addOption(option);
+
+        // Add Immutable & Mutable Facts
+        InputProgram facts = new ASPInputProgram();
+        facts.addProgram(immutableFacts);
+        facts.addProgram(mutableFacts);
+        handler.addProgram(facts);
+
+        // Add ASP Program
+        handler.addProgram(inputProgram);
+
+        Output o = handler.startSync();
+        AnswerSets answers = (AnswerSets) o;
+        int n = 0;
+        List<String> commands = new ArrayList<>();
+
+        if (!answers.getAnswersets().isEmpty()) {
+            AnswerSet a = answers.getAnswersets().get(0);
+
+            try {
+
+                for (Object obj : a.getAtoms()) {
+                    if (obj instanceof Move) {
+                        Move move = (Move) obj;
+                        commands.add(move.toUpperString());
+                    }
+                    if (obj instanceof Torpedo) {
+                        Torpedo torpedo = (Torpedo) obj;
+                        commands.add(" | " + torpedo.toUpperString());
+                    }
+                }
+
+                System.out.println(commands);
+            }
+            catch (Exception e) { e.printStackTrace(); }
+        }
+
+//        for (AnswerSet a : answers.getAnswersets()) {
+//            System.out.println("AS n.: " + ++n);
+//            try {
+//
+//                for (Object obj : a.getAtoms()) {
+//                    if (obj instanceof Move) {
+//                        Move move = (Move) obj;
+//                        commands.add(move.toUpperString());
+//                    }
+//                    if (obj instanceof Torpedo) {
+//                        Torpedo torpedo = (Torpedo) obj;
+//                        commands.add(" | " + torpedo.toUpperString());
+//                    }
+//                }
+//
+//                System.out.println(commands);
+//            }
+//            catch (Exception e) { e.printStackTrace(); }
+//        }
+
+        return commands;
     }
 }

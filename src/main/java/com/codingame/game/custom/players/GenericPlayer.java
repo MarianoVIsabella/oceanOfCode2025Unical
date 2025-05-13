@@ -107,17 +107,10 @@ public class GenericPlayer {
     protected List<Integer> chooseInitialPosition() {
         List<Integer> toRet = new ArrayList<>();
 
-        toRet.add(7); toRet.add(7);
+        toRet.add(7);
+        toRet.add(7);
 
         return toRet;
-//        for (int i = 0; i < this.gridHeight; i++)
-//            for (int j = 0; j < this.gridWidth; j++)
-//                if (this.gridCells[i][j]) {
-//                    System.out.print(i + " " + j);
-//                    System.err.println(String.format(infoBaseString, playerName) +
-//                            "Chosen Position by default Chooser");
-//                    return;
-//                }
     }
 
     // By Default, it tells to move north and not to use any powers
@@ -133,7 +126,23 @@ public class GenericPlayer {
     }
 
     // It helps to print out the next Aciton
-    private void printNextAction(List<String> action) {}
+    private void printNextAction(List<String> action) {
+        StringBuilder nextAction = new StringBuilder();
+
+        for (String a : action) {
+
+            if(a.equals("SURFACE")) {
+                nextAction.append(a);
+            }
+
+            if (a.startsWith("MOVE")) {
+                nextAction.insert(0, a);
+            }
+            nextAction.append(" | ").append(a);
+        }
+
+        System.out.println(nextAction);
+    }
 
     protected void updateInitialInternalState() {}
     protected void updateCurrentInternalState() {}
