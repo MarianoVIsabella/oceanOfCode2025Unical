@@ -8,6 +8,8 @@ public class Move {
     @Param(0)
     private String dir;
 
+    public Move() {}
+
     public Move(String dir) {
         this.dir = dir;
     }
@@ -26,6 +28,6 @@ public class Move {
     }
 
     public String toUpperString(){
-        return "MOVE " + dir;
+        return "MOVE " + dir.toUpperCase();
     }
 }
