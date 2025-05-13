@@ -3,9 +3,9 @@ package com.codingame.game.custom.players;
 import java.util.*;
 
 /**
-    * Base Class for Input Parsing and Game Cycles Handling.
-    * It contains all the basic information to successfully compute a valid position to play the game
-**/
+ * Base Class for Input Parsing and Game Cycles Handling.
+ * It contains all the basic information to successfully compute a valid position to play the game
+ **/
 public class GenericPlayer {
 
     public static class Statistics {
@@ -20,9 +20,9 @@ public class GenericPlayer {
 
         // Powers' Cooldown Values
         public int torpedoCooldown = -1,
-                    sonarCooldown = -1,
-                    silenceCooldown = -1,
-                    mineCooldown = -1;
+                sonarCooldown = -1,
+                silenceCooldown = -1,
+                mineCooldown = -1;
 
         // Powers' Results
         public String sonarResult = "NA";
@@ -39,10 +39,12 @@ public class GenericPlayer {
     // Game Statitics
     protected Statistics stats;
 
-    protected static final String infoBaseString =  " ----- [%s]";
+    protected static final String infoBaseString = " ----- [%s]";
     protected String playerName = "Generic Game Player";
 
-    public static void main(String[] args) { new GenericPlayer().handleGameCycles(); }
+    public static void main(String[] args) {
+        new GenericPlayer().handleGameCycles();
+    }
 
     protected void handleGameCycles() {
         Scanner in = new Scanner(System.in);
@@ -69,7 +71,8 @@ public class GenericPlayer {
         while (true) {
 
             // Read info about the Current Game Round
-            this.stats.positionX = in.nextInt(); this.stats.positionY = in.nextInt();
+            this.stats.positionX = in.nextInt();
+            this.stats.positionY = in.nextInt();
             this.stats.myLifeValue = in.nextInt();
 
             this.stats.opponentLifeValue = in.nextInt();
@@ -91,9 +94,29 @@ public class GenericPlayer {
         }
     }
 
+    protected void printNextAction(ArrayList<String> action) {
+
+        StringBuilder nextAction = new StringBuilder();
+
+        for (String a : action) {
+
+            if(a.equals("SURFACE")) {
+                nextAction.append(a);
+            }
+
+            if (a.startsWith("MOVE")) {
+                nextAction.insert(0, a);
+            }
+            nextAction.append(" | ").append(a);
+        }
+
+        System.out.println(nextAction);
+    }
+
     // By Default, it prints the first valid cell it finds looking row by row
     protected void chooseAndPrintInitialPosition() {
-        System.out.println("7 7"); return;
+        System.out.println("7 7");
+        return;
 //        for (int i = 0; i < this.gridHeight; i++)
 //            for (int j = 0; j < this.gridWidth; j++)
 //                if (this.gridCells[i][j]) {
