@@ -42,6 +42,21 @@
             <artifactId>module-endscreen</artifactId>
             <version>${gamengine.version}</version>
         </dependency>
+
+        <!-- ASP Dependencies -->
+        <dependency> <!-- Emb ASP -->
+            <groupId>it.unical.mat</groupId>
+            <artifactId>embasp</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/embASP.jar</systemPath>
+        </dependency>
+
+        <dependency> <!-- Antlr 4.7 - Maven Central -->
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.7</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,3 +1,5 @@
+package com.codingame.game.custom.players;
+
 import java.util.*;
 
 /**
@@ -7,6 +9,7 @@ import java.util.*;
 public class GenericPlayer {
 
     public static class Statistics {
+
         // Current Player Stats
         public int positionX = -1, positionY = -1;
         public int myLifeValue = 6;

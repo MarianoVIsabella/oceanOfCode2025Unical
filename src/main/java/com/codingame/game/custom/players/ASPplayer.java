@@ -1,3 +1,5 @@
+package com.codingame.game.custom.players;
+
 import com.codingame.game.custom.ASPclasses.Move;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;

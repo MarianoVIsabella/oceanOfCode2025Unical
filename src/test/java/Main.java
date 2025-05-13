@@ -1,3 +1,5 @@
+import com.codingame.game.custom.players.GenericPlayer;
+import com.codingame.game.custom.players.ASPplayer;
 import com.codingame.gameengine.runner.MultiplayerGameRunner;
 
 public class Main {
@@ -14,13 +16,19 @@ public class Main {
         gameRunner.setSeed(1337L);
 
         // add player 1
+//        if (null != cli1) {
+//            gameRunner.addAgent(cli1);
+//        } else {
+//            gameRunner.addAgent(DummyPlayer.class);
+//        }
+//        // add player 2
+//        if (null != cli2) {
+//            gameRunner.addAgent(cli2);
+//        } else {
+//            gameRunner.addAgent(DummyPlayer.class);
+//        }
         gameRunner.addAgent(GenericPlayer.class);
-        // add player 2
-        if (null != cli2) {
-            gameRunner.addAgent(cli2);
-        } else {
-            gameRunner.addAgent(ASPplayer.class);
-        }
+        gameRunner.addAgent(GenericPlayer.class);
         //gameRunner.addAgent(Player2.class);
 
         //gameRunner.addAgent("python3 bot.py");
