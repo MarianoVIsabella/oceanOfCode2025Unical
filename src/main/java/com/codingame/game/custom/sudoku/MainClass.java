@@ -46,9 +46,7 @@ public class MainClass {
 		//Se si esegue la demo su Linux 64bit scommentare la seguente istruzione:
 		//handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
 		
-		//Se si esegue la demo su MacOS 64bit scommentare la seguente istruzione:
-		//handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2-macOS-64bit.mac_5"));
-		
+
 		//In alternativa, aggiungere nella cartella lib l'eseguibile di DLV2 
 		//appropriato in base al proprio sistema e sostituire a "nome_exe_dlv2" 
 		//il nome dell'eseguibile di DLV2 nella seguente istruzione e scommentarla
