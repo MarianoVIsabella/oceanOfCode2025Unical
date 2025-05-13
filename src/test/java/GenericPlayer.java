@@ -1,5 +1,3 @@
-package com.codingame.game.custom;
-
 import java.util.*;
 
 /**
@@ -8,7 +6,7 @@ import java.util.*;
 **/
 public class GenericPlayer {
 
-    public class Statistics {
+    public static class Statistics {
         // Current Player Stats
         public int positionX = -1, positionY = -1;
         public int myLifeValue = 6;
@@ -41,11 +39,9 @@ public class GenericPlayer {
     protected static final String infoBaseString =  " ----- [%s]";
     protected String playerName = "Generic Game Player";
 
-    public static void main(String[] args) {
-        new GenericPlayer().handleGameCycles(args);
-    }
+    public static void main(String[] args) { new GenericPlayer().handleGameCycles(); }
 
-    protected void handleGameCycles(String[] args) {
+    protected void handleGameCycles() {
         Scanner in = new Scanner(System.in);
 
         // Read Game infos about Board and Player Id
@@ -94,20 +90,22 @@ public class GenericPlayer {
 
     // By Default, it prints the first valid cell it finds looking row by row
     protected void chooseAndPrintInitialPosition() {
-        for (int i = 0; i < this.gridHeight; i++)
-            for (int j = 0; j < this.gridWidth; j++)
-                if (this.gridCells[j][i]) {
-                    System.out.print(i + " " + j);
-                    System.err.println(String.format(infoBaseString, playerName) +
-                            "Chosen Position by default Chooser");
-                    return;
-                }
+        System.out.println("7 7"); return;
+//        for (int i = 0; i < this.gridHeight; i++)
+//            for (int j = 0; j < this.gridWidth; j++)
+//                if (this.gridCells[i][j]) {
+//                    System.out.print(i + " " + j);
+//                    System.err.println(String.format(infoBaseString, playerName) +
+//                            "Chosen Position by default Chooser");
+//                    return;
+//                }
     }
 
     // By Default, it tells to move north and not to use any powers
     protected void chooseAndPrintNextAction() {
         System.out.println("MOVE S");
         System.err.println(String.format(infoBaseString, playerName) + "Chosen Position by default Chooser");
+        System.err.println(gridWidth + "x" + gridHeight + " grid");
     }
 }
 

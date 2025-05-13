@@ -12,12 +12,9 @@ public class Main {
         // Set league, remove before push.
         gameRunner.setLeagueLevel(3);
         gameRunner.setSeed(1337L);
+
         // add player 1
-        if (null != cli1) {
-            gameRunner.addAgent(cli1);
-        } else {
-            gameRunner.addAgent(ASPplayer.class);
-        }
+        gameRunner.addAgent(GenericPlayer.class);
         // add player 2
         if (null != cli2) {
             gameRunner.addAgent(cli2);
