@@ -207,10 +207,13 @@ public class ASPPlayer {
     protected void prepareInitialInternalState() {
 
         // ----- Game Mode ---------------------------------------------------------------------------------------------
+        // ----- GAME MODE ON ------------------------------------------------------------------------------------------
         // this.setBotNameAndASPProgram();
-        // ----- Game Mode ---------------------------------------------------------------------------------------------
 
-        // this.playerName += " " + this.id;
+        // ----- GAME MODE OFF -----------------------------------------------------------------------------------------
+        this.playerName += " " + this.id;
+
+        // ----- Game Mode ---------------------------------------------------------------------------------------------
 
         this.aspHelper.aspInputProgram.addFilesPath(this.aspHelper.aspProgramPath);
 
