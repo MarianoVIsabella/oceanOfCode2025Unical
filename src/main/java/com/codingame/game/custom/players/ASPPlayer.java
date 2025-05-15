@@ -15,6 +15,7 @@ import it.unical.mat.embasp.languages.asp.AnswerSets;
 import it.unical.mat.embasp.platforms.desktop.DesktopHandler;
 import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -45,7 +46,7 @@ public class ASPPlayer {
 
     public static class ASPHelper {
         // Path to ASP File to be executed
-        public String aspProgramPath = "encodings/prova";
+        public String aspProgramPath = "encodings/allASPFilePrograms/prova";
 
         // Types of Facts to be submitted to ASP Program
         public String immutableFacts;
@@ -69,8 +70,8 @@ public class ASPPlayer {
     protected int id;
 
     // Player's Info
-    protected static final String infoBaseString =  " ----- [%s] %s%n";
-    protected String playerName = "New Game Player";
+    protected static final String infoBaseString =  " ----- [ %s ] %s%n";
+    protected String playerName = "ASP Player";
 
     // Game Statistics
     protected Statistics stats;
@@ -136,7 +137,6 @@ public class ASPPlayer {
 
         // Declaring Container for Program Inputs
         this.aspHelper.aspInputProgram = new ASPInputProgram();
-        this.aspHelper.aspInputProgram.addFilesPath(this.aspHelper.aspProgramPath);
 
         // Declaring String Builder in order to collect Data to create ASP Predicates
         this.aspHelper.sb = new StringBuilder();
@@ -187,8 +187,32 @@ public class ASPPlayer {
         this.stats.opponentOrders = in.nextLine();
     }
 
+    protected void setBotNameAndASPProgram() {
+        // Given the Player ID:
+        // - the Player can now dynamically choose with ASP Program to execute
+        // - the Player Name can now be shown from the File Name
+
+        String baseFilePath = "encodings/player" + this.id;
+        File folder = new File(baseFilePath);
+
+        // The First (and Only) file in the folder will be the file program to execute
+        File aspProgram = Objects.requireNonNull(folder.listFiles(File::isFile))[0];
+
+        // Setting Player Info based on which ASP Program is executed
+        this.aspHelper.aspProgramPath = baseFilePath + '/' + aspProgram.getName();
+        this.playerName = aspProgram.getName() + " Bot";
+    }
+
     // States' Handling
     protected void prepareInitialInternalState() {
+
+        // ----- Game Mode ---------------------------------------------------------------------------------------------
+        // this.setBotNameAndASPProgram();
+        // ----- Game Mode ---------------------------------------------------------------------------------------------
+
+        // this.playerName += " " + this.id;
+
+        this.aspHelper.aspInputProgram.addFilesPath(this.aspHelper.aspProgramPath);
 
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);

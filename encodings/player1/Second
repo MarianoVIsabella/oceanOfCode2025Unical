@@ -1,0 +1,13 @@
+%% ASP Program for Player 1
+
+move(n) | move(s) | move(w) | move(e).
+
+#show move/1.
+
+moveIntoCell(R-1, C) :- myPos(R, C), move(n).
+moveIntoCell(R+1, C) :- myPos(R, C), move(s).
+moveIntoCell(R, C-1) :- myPos(R, C), move(w).
+moveIntoCell(R, C+1) :- myPos(R, C), move(e).
+
+:- moveIntoCell(R, C), not waterCell(R, C).
+:- moveIntoCell(R, C), visitedCell(R, C).
