@@ -269,17 +269,29 @@ public class NewPlayer {
     }
 
 
-    // By Default, it prints the first valid cell it finds looking row by row
+    // By Default, it gives back the first valid random cell it finds
     protected List<Integer> chooseInitialPosition() {
 
-        for (int row = 0; row < this.gridHeight; row++) {
-            for (int col = 0; col < this.gridWidth; col++)
-                if (this.gridCells[row][col] == 0)
-                    return List.of(col, row);
+//        // By Default, it prints the first valid cell it finds looking row by row
+//        for (int row = 0; row < this.gridHeight; row++) {
+//            for (int col = 0; col < this.gridWidth; col++)
+//                if (this.gridCells[row][col] == 0)
+//                    return List.of(col, row);
+//
+//        }
 
+        Random random = new Random();
+        int possibleRow, possibleCol;
+
+        while (true) {
+            possibleRow = random.nextInt(this.gridHeight);
+            possibleCol = random.nextInt(this.gridWidth);
+
+            if (this.gridCells[possibleRow][possibleCol] == 0)
+                return List.of(possibleCol, possibleRow);
         }
 
-        return List.of();
+        // return List.of();
     }
 
     // By Default, it tells to Move South and not to use any powers
