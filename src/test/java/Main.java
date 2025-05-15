@@ -1,5 +1,4 @@
-import com.codingame.game.custom.players.GenericPlayer;
-import com.codingame.game.custom.tempPlayer.NewPlayer;
+import com.codingame.game.custom.players.ASPPlayer;
 import com.codingame.gameengine.runner.MultiplayerGameRunner;
 
 public class Main {
@@ -28,8 +27,8 @@ public class Main {
 //            gameRunner.addAgent(DummyPlayer.class);
 //        }
 
-        gameRunner.addAgent(NewPlayer.class);
-        gameRunner.addAgent(NewPlayer.class);
+        gameRunner.addAgent(ASPPlayer.class);
+        gameRunner.addAgent(ASPPlayer.class);
         //gameRunner.addAgent(Player2.class);
 
         //gameRunner.addAgent("python3 bot.py");

@@ -1,4 +1,4 @@
-package com.codingame.game.custom.tempPlayer;
+package com.codingame.game.custom.players;
 
 import com.codingame.game.custom.ASPclasses.Move;
 import com.codingame.game.custom.ASPclasses.Torpedo;
@@ -21,7 +21,7 @@ import java.util.*;
  ** Base Class for Input Parsing and Game Cycles Handling, with a few Helper Classes.
  ** It contains all the basic information to successfully compute a valid position to play the game
  **/
-public class NewPlayer {
+public class ASPPlayer {
 
     public static class Statistics {
 
@@ -80,9 +80,9 @@ public class NewPlayer {
 
     protected Scanner in;
 
-    public static void main(String[] args) { new NewPlayer().handleGameCycles(); }
+    public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
-    public NewPlayer() { this.init(); }
+    public ASPPlayer() { this.init(); }
 
     protected void handleGameCycles() {
 
