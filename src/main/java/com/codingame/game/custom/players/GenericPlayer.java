@@ -26,7 +26,6 @@ public class GenericPlayer {
 
         // Powers' Results
         public String sonarResult = "NA";
-
     }
 
     // Grid Dimensions & Cells' info
@@ -39,7 +38,7 @@ public class GenericPlayer {
     // Game Statitics
     protected Statistics stats;
 
-    protected static final String infoBaseString =  " ----- [%s]";
+    protected static final String infoBaseString =  " ----- [%s] ";
     protected String playerName = "Generic Game Player";
 
     public static void main(String[] args) { new GenericPlayer().handleGameCycles(); }
@@ -126,17 +125,20 @@ public class GenericPlayer {
     }
 
     // It helps to print out the next Aciton
-    private void printNextAction(List<String> action) {
+    protected void printNextAction(List<String> action) {
+        System.err.println(action);
         StringBuilder nextAction = new StringBuilder();
 
         for (String a : action) {
 
             if(a.equals("SURFACE")) {
                 nextAction.append(a);
+                break;
             }
 
             if (a.startsWith("MOVE")) {
                 nextAction.insert(0, a);
+                continue;
             }
             nextAction.append(" | ").append(a);
         }
