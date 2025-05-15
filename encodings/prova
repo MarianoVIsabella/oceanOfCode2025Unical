@@ -1,17 +1,17 @@
 move(n) | move(s) | move(e) | move(w).
 
-:- move(n), myPos(_, Y), Y=0.
-:- move(s), myPos(_, Y), Y=14.
-:- move(w), myPos(X, _), X=0.
-:- move(e), myPos(X, _), X=14.
+% :- move(n), myPos(_, Y), Y=0.
+% :- move(s), myPos(_, Y), Y=14.
+% :- move(w), myPos(X, _), X=0.
+% :- move(e), myPos(X, _), X=14.
 
-moveIntoCell(X, Y-1) :- myPos(X, Y), move(n).
-moveIntoCell(X, Y+1) :- myPos(X, Y), move(s).
-moveIntoCell(X-1, Y) :- myPos(X, Y), move(w).
-moveIntoCell(X+1, Y) :- myPos(X, Y), move(e).
+% moveIntoCell(X, Y-1) :- myPos(X, Y), move(n).
+% moveIntoCell(X, Y+1) :- myPos(X, Y), move(s).
+% moveIntoCell(X-1, Y) :- myPos(X, Y), move(w).
+% moveIntoCell(X+1, Y) :- myPos(X, Y), move(e).
 
-:- moveIntoCell(X, Y), visitedCell(X, Y).
+% :- moveIntoCell(X, Y), visitedCell(X, Y).
 
-:- moveIntoCell(X, Y), not waterCell(X, Y).
+% :- moveIntoCell(X, Y), not waterCell(X, Y).
 
 #show move/1.

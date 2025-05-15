@@ -4,18 +4,22 @@ import com.codingame.game.custom.ASPclasses.Move;
 import com.codingame.game.custom.ASPclasses.Torpedo;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
+import it.unical.mat.embasp.base.OptionDescriptor;
+import it.unical.mat.embasp.base.Output;
 import it.unical.mat.embasp.languages.IllegalAnnotationException;
 import it.unical.mat.embasp.languages.ObjectNotValidException;
 import it.unical.mat.embasp.languages.asp.ASPInputProgram;
 import it.unical.mat.embasp.languages.asp.ASPMapper;
+import it.unical.mat.embasp.languages.asp.AnswerSet;
+import it.unical.mat.embasp.languages.asp.AnswerSets;
 import it.unical.mat.embasp.platforms.desktop.DesktopHandler;
 import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
 import java.util.*;
 
 /**
- * Base Class for Input Parsing and Game Cycles Handling.
- * It contains all the basic information to successfully compute a valid position to play the game
+ ** Base Class for Input Parsing and Game Cycles Handling, with a few Helper Classes.
+ ** It contains all the basic information to successfully compute a valid position to play the game
  **/
 public class NewPlayer {
 
@@ -40,7 +44,7 @@ public class NewPlayer {
     }
 
     public static class ASPHelper {
-        // Path to ASP File to be excecuted
+        // Path to ASP File to be executed
         public String aspProgramPath = "encodings/prova";
 
         // Types of Facts to be submitted to ASP Program
@@ -61,10 +65,10 @@ public class NewPlayer {
     protected int gridWidth, gridHeight;
     protected int[][] gridCells;
 
-    // Player Id
+    // Player ID
     protected int id;
 
-    // Game Statitics
+    // Game Statistics
     protected Statistics stats;
 
     // ASP Helper
@@ -105,7 +109,7 @@ public class NewPlayer {
     protected void handleGameCycles() {
         Scanner in = new Scanner(System.in);
 
-        // Read Game infos about Board and Player Id
+        // Read Game infos about Board and Player ID
         this.gridWidth = in.nextInt();
         this.gridHeight = in.nextInt();
         this.id = in.nextInt();
@@ -163,61 +167,7 @@ public class NewPlayer {
         }
     }
 
-
-    // By Default, it prints the first valid cell it finds looking row by row
-    protected List<Integer> chooseInitialPosition() {
-        List<Integer> toRet = new ArrayList<>();
-
-        for (int row = 0; row < this.gridHeight; row++) {
-            for (int col = 0; col < this.gridWidth; col++)
-                if (this.gridCells[row][col] == 0) {
-                    toRet.add(col); toRet.add(row);
-                    return toRet;
-                }
-        }
-
-//        toRet.add(7);
-//        toRet.add(7);
-
-        return toRet;
-    }
-
-    // By Default, it tells to move north and not to use any powers
-    protected List<String> chooseNextAction() {
-        System.err.printf(infoBaseString, this.playerName, "Choosing which action to execute");
-
-        System.err.printf(infoBaseString, this.playerName, "ASP Facts:");
-        System.err.printf(infoBaseString, this.playerName, "Immutable: " + this.aspHelper.immutableFacts);
-        System.err.printf(infoBaseString, this.playerName, "Mutable: "+ this.aspHelper.mutableFacts);
-
-        List<String> toRet = new ArrayList<>();
-        toRet.add("MOVE S");
-
-        return toRet;
-    }
-
-    // It helps to print out the next Aciton
-    protected void printNextAction(List<String> actions) {
-        System.err.printf(infoBaseString, this.playerName, "Executing this set of actions: " + actions);
-        StringBuilder nextAction = new StringBuilder();
-
-        for (String a : actions) {
-
-            if(a.equals("SURFACE")) {
-                nextAction.append(a);
-                break;
-            }
-
-            if (a.startsWith("MOVE")) {
-                nextAction.insert(0, a);
-                continue;
-            }
-            nextAction.append(" | ").append(a);
-        }
-
-        System.out.println(nextAction);
-    }
-
+    // States' Handling
     protected void prepareInitialInternalState() {
 
         // Refreshing StringBuilder if not empty
@@ -227,7 +177,7 @@ public class NewPlayer {
         for (int i = 0; i < this.gridWidth; i++)
             for (int j = 0; j < this.gridHeight; j++)
                 if (this.gridCells[i][j] != 2)
-                    this.aspHelper.sb.append("watercell(").append(i)
+                    this.aspHelper.sb.append("waterCell(").append(i)
                             .append(", ").append(j).append("). ");
 
         this.aspHelper.immutableFacts = this.aspHelper.sb.toString();
@@ -239,6 +189,13 @@ public class NewPlayer {
         this.aspHelper.sb.setLength(0);
     }
 
+    protected void updateInitialInternalState(List<Integer> position) {
+
+        // Update Initial Position as Visited
+        this.gridCells[position.get(1)][position.get(0)] = 1;
+
+    }
+
     protected void prepareCurrentInternalState() {
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
@@ -248,9 +205,6 @@ public class NewPlayer {
             for (int col = 0; col < this.gridWidth; col++)
                 if (this.gridCells[row][col] == 1)
                     this.aspHelper.sb.append("visitedCell(").append(row).append(", ").append(col).append("). ");
-
-//        // Player's Position as Visited
-//        this.aspHelper.sb.append("visitedCell(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
 
         // Defining Statistics of Current Round
         this.aspHelper.sb.append("myPos(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
@@ -273,6 +227,7 @@ public class NewPlayer {
 
         this.aspHelper.mutableFacts = this.aspHelper.sb.toString();
         this.aspHelper.sb.setLength(0);
+
     }
 
     protected void updateCurrentInternalState(List<String> actions) {
@@ -284,22 +239,107 @@ public class NewPlayer {
                 .findFirst()
                 .ifPresent(dir -> {
                     switch (dir) {
-                        case "N" -> { this.gridCells[this.stats.positionY - 1][this.stats.positionX] = 1; }
-                        case "S" -> { this.gridCells[this.stats.positionY + 1][this.stats.positionX] = 1; }
-                        case "W" -> { this.gridCells[this.stats.positionY][this.stats.positionX - 1] = 1; }
-                        case "E" -> { this.gridCells[this.stats.positionY][this.stats.positionX + 1] = 1; }
+                        case "N" -> this.gridCells[this.stats.positionY - 1][this.stats.positionX] = 1;
+                        case "S" -> this.gridCells[this.stats.positionY + 1][this.stats.positionX] = 1;
+                        case "W" -> this.gridCells[this.stats.positionY][this.stats.positionX - 1] = 1;
+                        case "E" -> this.gridCells[this.stats.positionY][this.stats.positionX + 1] = 1;
                     }
                 });
 
     }
 
-    protected void updateInitialInternalState(List<Integer> position) {
 
-        // Update Initial Position as Visited
-        this.gridCells[position.get(1)][position.get(0)] = 1;
+    // By Default, it prints the first valid cell it finds looking row by row
+    protected List<Integer> chooseInitialPosition() {
 
+        for (int row = 0; row < this.gridHeight; row++) {
+            for (int col = 0; col < this.gridWidth; col++)
+                if (this.gridCells[row][col] == 0)
+                    return List.of(col, row);
 
+        }
+
+        return List.of();
     }
+
+    // By Default, it tells to Move South and not to use any powers
+    protected List<String> chooseNextAction() {
+        System.err.printf(infoBaseString, this.playerName, "Choosing which action to execute");
+
+        System.err.printf(infoBaseString, this.playerName, "ASP Facts:");
+        System.err.printf(infoBaseString, this.playerName, "Immutable: " + this.aspHelper.immutableFacts);
+        System.err.printf(infoBaseString, this.playerName, "Mutable: " + this.aspHelper.mutableFacts);
+
+        List<String> commands = new ArrayList<>();
+
+        // Cleaning Data for ASP Program
+        this.aspHelper.handler.removeAll();
+
+        // Setting Options to get all possible AnswerSets
+        OptionDescriptor allAnsSetOption = new OptionDescriptor("-n 0");
+        this.aspHelper.handler.addOption(allAnsSetOption);
+
+        // Adding Current Facts from Game Round
+        if (!this.aspHelper.mutableFacts.isEmpty())
+            this.aspHelper.handler.addProgram(new ASPInputProgram(this.aspHelper.mutableFacts));
+
+        // Adding ASP Program and Immutable Facts
+        this.aspHelper.handler.addProgram(this.aspHelper.aspInputProgram);
+
+        // Getting the AnswerSets
+        Output aspProgramOutput = this.aspHelper.handler.startSync();
+        AnswerSets answerSets = (AnswerSets) aspProgramOutput;
+
+        if (answerSets == null || answerSets.getAnswersets().isEmpty())
+            return List.of("MOVE S");
+
+        AnswerSet a = answerSets.getAnswersets().get(0);
+
+        try {
+            for (Object obj : a.getAtoms()) {
+                if (obj instanceof Move) {
+                    Move move = (Move) obj;
+                    commands.add(move.toUpperString());
+                }
+                else if (obj instanceof Torpedo) {
+                    Torpedo torpedo = (Torpedo) obj;
+                    commands.add(torpedo.toUpperString());
+                }
+            }
+            System.err.printf(infoBaseString, this.playerName, "Commands from ASP: " + commands);
+        }
+        catch (Exception e) {
+            System.err.printf(infoBaseString, this.playerName, "No command from ASP.");
+        }
+
+        if (!commands.isEmpty())
+            return Collections.unmodifiableList(commands);
+
+        return List.of("MOVE S");
+    }
+
+    // It helps to print out the next Actions in Standard Form
+    protected void printNextAction(List<String> actions) {
+        System.err.printf(infoBaseString, this.playerName, "Executing this set of actions: " + actions);
+        StringBuilder nextAction = new StringBuilder();
+
+        for (String a : actions) {
+
+            if(a.equals("SURFACE")) {
+                nextAction.append(a);
+                break;
+            }
+
+            if (a.startsWith("MOVE")) {
+                nextAction.insert(0, a);
+                continue;
+            }
+            nextAction.append(" | ").append(a);
+        }
+
+        System.out.println(nextAction);
+    }
+
 }
 
 
