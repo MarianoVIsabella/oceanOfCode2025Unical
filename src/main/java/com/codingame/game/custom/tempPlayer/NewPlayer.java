@@ -68,20 +68,57 @@ public class NewPlayer {
     // Player ID
     protected int id;
 
+    // Player's Info
+    protected static final String infoBaseString =  " ----- [%s] %s%n";
+    protected String playerName = "New Game Player";
+
     // Game Statistics
     protected Statistics stats;
 
     // ASP Helper
     protected ASPHelper aspHelper;
 
-    protected static final String infoBaseString =  " ----- [%s] %s%n";
-    protected String playerName = "New Game Player";
+    protected Scanner in;
 
     public static void main(String[] args) { new NewPlayer().handleGameCycles(); }
 
     public NewPlayer() { this.init(); }
 
+    protected void handleGameCycles() {
+
+        // Read the Initial Information from the Game, such as GridBoard and Player ID
+        this.readInitialGridInfo();
+
+        // Prepare Initial Internal State
+        this.prepareInitialInternalState();
+
+        // Choose Player's Initial Position and Print it
+        List<Integer> initPos =  this.chooseInitialPosition();
+        System.out.printf("%d %d%n", initPos.get(0), initPos.get(1));
+
+        // Update Initial Internal State
+        this.updateInitialInternalState(initPos);
+
+        // Game loop
+        while (true) {
+
+            this.readGameRoundInfo();
+
+            // Prepare Current Internal State
+            this.prepareCurrentInternalState();
+
+            // Choose where to move next
+            List<String> actions = this.chooseNextAction();
+            printNextAction(actions);
+
+            this.updateCurrentInternalState(actions);
+        }
+    }
+
+    // Helping Methods, mainly for Clean Code and Readability
     protected void init() {
+
+        // Instancing Helping Classes
         this.aspHelper = new ASPHelper();
         this.stats = new Statistics();
 
@@ -106,8 +143,10 @@ public class NewPlayer {
 
     }
 
-    protected void handleGameCycles() {
-        Scanner in = new Scanner(System.in);
+    protected void readInitialGridInfo() {
+
+        // Instancing new Scanner from Input
+        if (this.in == null) this.in = new Scanner(System.in);
 
         // Read Game infos about Board and Player ID
         this.gridWidth = in.nextInt();
@@ -124,47 +163,28 @@ public class NewPlayer {
             for (int col = 0; col < this.gridWidth; col++)
                 gridCells[row][col] = (line.charAt(col) == 'x') ? 2 : 0;
         }
+    }
 
-        // Prepare Initial Internal State
-        this.prepareInitialInternalState();
+    protected void readGameRoundInfo() {
 
-        // Choose Player's Initial Position and Print it
-        List<Integer> initPos =  this.chooseInitialPosition();
-        System.out.printf("%d %d%n", initPos.get(0), initPos.get(1));
+        // Read info about the Current Game Round
+        this.stats.positionX = in.nextInt();
+        this.stats.positionY = in.nextInt();
+        this.stats.myLifeValue = in.nextInt();
 
-        // Update Initial Internal State
-        this.updateInitialInternalState(initPos);
+        this.stats.opponentLifeValue = in.nextInt();
 
-        // Game loop
-        while (true) {
+        // Powers' Cooldown Values
+        this.stats.torpedoCooldown = in.nextInt();
+        this.stats.sonarCooldown = in.nextInt();
+        this.stats.silenceCooldown = in.nextInt();
+        this.stats.mineCooldown = in.nextInt();
+        this.stats.sonarResult = in.next();
 
-            // Read info about the Current Game Round
-            this.stats.positionX = in.nextInt(); this.stats.positionY = in.nextInt();
-            this.stats.myLifeValue = in.nextInt();
+        if (in.hasNextLine()) in.nextLine();
 
-            this.stats.opponentLifeValue = in.nextInt();
-
-            // Powers' Cooldown Values
-            this.stats.torpedoCooldown = in.nextInt();
-            this.stats.sonarCooldown = in.nextInt();
-            this.stats.silenceCooldown = in.nextInt();
-            this.stats.mineCooldown = in.nextInt();
-            this.stats.sonarResult = in.next();
-
-            if (in.hasNextLine()) in.nextLine();
-
-            // Opponent's Last Message
-            this.stats.opponentOrders = in.nextLine();
-
-            // Prepare Current Internal State
-            this.prepareCurrentInternalState();
-
-            // Choose where to move next
-            List<String> actions = this.chooseNextAction();
-            printNextAction(actions);
-
-            this.updateCurrentInternalState(actions);
-        }
+        // Opponent's Last Message
+        this.stats.opponentOrders = in.nextLine();
     }
 
     // States' Handling

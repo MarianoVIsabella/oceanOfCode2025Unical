@@ -1,4 +1,15 @@
-move(n) | move(s) | move(e) | move(w).
+move(n) | move(s) | move(w) | move(e).
+
+#show move/1.
+
+moveIntoCell(R-1, C) :- myPos(R, C), move(n).
+moveIntoCell(R+1, C) :- myPos(R, C), move(s).
+moveIntoCell(R, C-1) :- myPos(R, C), move(w).
+moveIntoCell(R, C+1) :- myPos(R, C), move(e).
+
+:- moveIntoCell(R, C), not waterCell(R, C).
+:- moveIntoCell(R, C), visitedCell(R, C).
+
 
 % :- move(n), myPos(_, Y), Y=0.
 % :- move(s), myPos(_, Y), Y=14.
@@ -13,5 +24,3 @@ move(n) | move(s) | move(e) | move(w).
 % :- moveIntoCell(X, Y), visitedCell(X, Y).
 
 % :- moveIntoCell(X, Y), not waterCell(X, Y).
-
-#show move/1.
