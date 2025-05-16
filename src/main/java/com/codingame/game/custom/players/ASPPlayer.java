@@ -81,7 +81,11 @@ public class ASPPlayer {
 
     protected Scanner in;
 
-    protected static boolean GAME_MODE_ON = false;
+    // Usage Settings
+    // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
+    protected static final boolean GAME_MODE_ON = false;
+    // ---- DEBUG MODE: To be use ONLY when running the Bot.main() as Program
+    protected static final boolean DEBUG_MODE_ON = false;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
@@ -145,6 +149,29 @@ public class ASPPlayer {
 
     }
 
+    protected void setBotNameAndASPProgram() {
+        // Given the Player ID:
+        // - the Player can now dynamically choose with ASP Program to execute
+        // - the Player Name can now be shown from the File Name
+
+        // ----- GAME MODE OFF -----------------------------------------------------------------------------------------
+        if (!GAME_MODE_ON) {
+            this.playerName += " " + this.id;
+            return;
+        }
+
+        // ----- GAME MODE ON ------------------------------------------------------------------------------------------
+        String baseFilePath = "encodings/player" + this.id;
+        File folder = new File(baseFilePath);
+
+        // The First (and Only) file in the folder will be the file program to execute
+        File aspProgram = Objects.requireNonNull(folder.listFiles(File::isFile))[0];
+
+        // Setting Player Info based on which ASP Program is executed
+        this.aspHelper.aspProgramPath = baseFilePath + '/' + aspProgram.getName();
+        this.playerName = aspProgram.getName() + " Bot";
+    }
+
     protected void readInitialGridInfo() {
 
         // Instancing new Scanner from Input
@@ -189,27 +216,9 @@ public class ASPPlayer {
         this.stats.opponentOrders = in.nextLine();
     }
 
-    protected void setBotNameAndASPProgram() {
-        // Given the Player ID:
-        // - the Player can now dynamically choose with ASP Program to execute
-        // - the Player Name can now be shown from the File Name
-
-        // ----- GAME MODE OFF -----------------------------------------------------------------------------------------
-        if (!GAME_MODE_ON) {
-            this.playerName += " " + this.id;
-            return;
-        }
-
-        // ----- GAME MODE ON ------------------------------------------------------------------------------------------
-        String baseFilePath = "encodings/player" + this.id;
-        File folder = new File(baseFilePath);
-
-        // The First (and Only) file in the folder will be the file program to execute
-        File aspProgram = Objects.requireNonNull(folder.listFiles(File::isFile))[0];
-
-        // Setting Player Info based on which ASP Program is executed
-        this.aspHelper.aspProgramPath = baseFilePath + '/' + aspProgram.getName();
-        this.playerName = aspProgram.getName() + " Bot";
+    protected void printInfoMessage(String message) {
+        if (DEBUG_MODE_ON) System.out.printf(infoBaseString, this.playerName, message);
+        else System.err.printf(infoBaseString, this.playerName, message);
     }
 
     // States' Handling
@@ -223,11 +232,14 @@ public class ASPPlayer {
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
 
         // Defining Water Cells
-        for (int i = 0; i < this.gridWidth; i++)
-            for (int j = 0; j < this.gridHeight; j++)
+        for (int i = 0; i < this.gridWidth; i++) {
+            for (int j = 0; j < this.gridHeight; j++) {
                 if (this.gridCells[i][j] != 2)
-                    this.aspHelper.sb.append("waterCell(").append(i)
-                            .append(", ").append(j).append("). ");
+                    this.aspHelper.sb.append("waterCell(").append(i).append(", ").append(j).append("). ");
+            }
+
+            this.aspHelper.sb.append("\n");
+        }
 
         this.aspHelper.immutableFacts = this.aspHelper.sb.toString();
 
@@ -325,11 +337,11 @@ public class ASPPlayer {
 
     // By Default, it tells to Move South and not to use any powers
     protected List<String> chooseNextAction() {
-        System.err.printf(infoBaseString, this.playerName, "Choosing which action to execute");
+        this.printInfoMessage("Choosing which action to execute");
 
-        System.err.printf(infoBaseString, this.playerName, "ASP Facts:");
-        System.err.printf(infoBaseString, this.playerName, "Immutable: " + this.aspHelper.immutableFacts);
-        System.err.printf(infoBaseString, this.playerName, "Mutable: " + this.aspHelper.mutableFacts);
+        this.printInfoMessage("ASP Facts:");
+        this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
+        this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
         List<String> commands = new ArrayList<>();
 
@@ -337,8 +349,8 @@ public class ASPPlayer {
         this.aspHelper.handler.removeAll();
 
         // Setting Options to get all possible AnswerSets
-        OptionDescriptor allAnsSetOption = new OptionDescriptor("-n 0");
-        this.aspHelper.handler.addOption(allAnsSetOption);
+//        OptionDescriptor allAnsSetOption = new OptionDescriptor("-n 0");
+//        this.aspHelper.handler.addOption(allAnsSetOption);
 
         // Adding Current Facts from Game Round
         if (!this.aspHelper.mutableFacts.isEmpty())
@@ -367,10 +379,10 @@ public class ASPPlayer {
                     commands.add(torpedo.toUpperString());
                 }
             }
-            System.err.printf(infoBaseString, this.playerName, "Commands from ASP: " + commands);
+            this.printInfoMessage("Commands from ASP: " + commands);
         }
         catch (Exception e) {
-            System.err.printf(infoBaseString, this.playerName, "No command from ASP.");
+            this.printInfoMessage("No command from ASP.");
         }
 
         if (!commands.isEmpty())
@@ -381,7 +393,8 @@ public class ASPPlayer {
 
     // It helps to print out the next Actions in Standard Form
     protected void printNextAction(List<String> actions) {
-        System.err.printf(infoBaseString, this.playerName, "Executing this set of actions: " + actions);
+        this.printInfoMessage("Executing this set of actions: " + actions);
+
         StringBuilder nextAction = new StringBuilder();
 
         for (String a : actions) {
