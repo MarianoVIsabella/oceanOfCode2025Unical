@@ -70,7 +70,7 @@ public class ASPPlayer {
     protected int id;
 
     // Player's Info
-    protected static final String infoBaseString =  " ----- [ %s ] %s%n";
+    protected static final String infoBaseString =  "[ %s ] %s%n";
     protected String playerName = "ASP Player";
 
     // Game Statistics
@@ -80,6 +80,8 @@ public class ASPPlayer {
     protected ASPHelper aspHelper;
 
     protected Scanner in;
+
+    protected static boolean GAME_MODE_ON = false;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
@@ -192,6 +194,13 @@ public class ASPPlayer {
         // - the Player can now dynamically choose with ASP Program to execute
         // - the Player Name can now be shown from the File Name
 
+        // ----- GAME MODE OFF -----------------------------------------------------------------------------------------
+        if (!GAME_MODE_ON) {
+            this.playerName += " " + this.id;
+            return;
+        }
+
+        // ----- GAME MODE ON ------------------------------------------------------------------------------------------
         String baseFilePath = "encodings/player" + this.id;
         File folder = new File(baseFilePath);
 
@@ -206,14 +215,7 @@ public class ASPPlayer {
     // States' Handling
     protected void prepareInitialInternalState() {
 
-        // ----- Game Mode ---------------------------------------------------------------------------------------------
-        // ----- GAME MODE ON ------------------------------------------------------------------------------------------
-        // this.setBotNameAndASPProgram();
-
-        // ----- GAME MODE OFF -----------------------------------------------------------------------------------------
-        this.playerName += " " + this.id;
-
-        // ----- Game Mode ---------------------------------------------------------------------------------------------
+        this.setBotNameAndASPProgram();
 
         this.aspHelper.aspInputProgram.addFilesPath(this.aspHelper.aspProgramPath);
 
