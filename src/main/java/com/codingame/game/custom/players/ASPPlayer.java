@@ -85,7 +85,7 @@ public class ASPPlayer {
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
     protected static final boolean GAME_MODE_ON = false;
     // ---- DEBUG MODE: To be use ONLY when running the Bot.main() as Program
-    protected static final boolean DEBUG_MODE_ON = false;
+    protected static final boolean DEBUG_MODE_ON = true;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
@@ -217,7 +217,7 @@ public class ASPPlayer {
     }
 
     protected void printInfoMessage(String message) {
-        if (DEBUG_MODE_ON) System.out.printf(infoBaseString, this.playerName, message);
+        if (DEBUG_MODE_ON) System.out.printf("\u001B[3m ----- " + infoBaseString + "\u001B[0m", this.playerName, message);
         else System.err.printf(infoBaseString, this.playerName, message);
     }
 
@@ -310,6 +310,7 @@ public class ASPPlayer {
     }
 
 
+    // Actions' Handling
     // By Default, it gives back the first valid random cell it finds
     protected List<Integer> chooseInitialPosition() {
 
