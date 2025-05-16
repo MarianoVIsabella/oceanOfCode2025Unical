@@ -1,6 +1,7 @@
 package com.codingame.game.custom.players;
 
 import com.codingame.game.custom.ASPclasses.Move;
+import com.codingame.game.custom.ASPclasses.Surface;
 import com.codingame.game.custom.ASPclasses.Torpedo;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
@@ -33,6 +34,8 @@ public class ASPPlayer {
         // Opponent Player Stats
         public int opponentLifeValue = 6;
         public String opponentOrders = "NA";
+        public int opponentVerticalOffset = 0;
+        public int opponentHorizontalOffset = 0;
 
         // Powers' Cooldown Values
         public int torpedoCooldown = -1,
@@ -85,7 +88,7 @@ public class ASPPlayer {
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
     protected static final boolean GAME_MODE_ON = false;
     // ---- DEBUG MODE: To be use ONLY when running the Bot.main() as Program
-    protected static final boolean DEBUG_MODE_ON = true;
+    protected static final boolean DEBUG_MODE_ON = false;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
@@ -136,6 +139,7 @@ public class ASPPlayer {
         try {
             ASPMapper.getInstance().registerClass(Move.class);
             ASPMapper.getInstance().registerClass(Torpedo.class);
+            ASPMapper.getInstance().registerClass(Surface.class);
         }
         catch (ObjectNotValidException | IllegalAnnotationException e1) {
             System.err.println(Arrays.toString(e1.getStackTrace()));
@@ -232,10 +236,10 @@ public class ASPPlayer {
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
 
         // Defining Water Cells
-        for (int i = 0; i < this.gridWidth; i++) {
-            for (int j = 0; j < this.gridHeight; j++) {
-                if (this.gridCells[i][j] != 2)
-                    this.aspHelper.sb.append("waterCell(").append(i).append(", ").append(j).append("). ");
+        for (int row = 0; row < this.gridHeight; row++) {
+            for (int col = 0; col < this.gridWidth; col++) {
+                if (this.gridCells[row][col] != 2)
+                    this.aspHelper.sb.append("waterCell(").append(row).append(", ").append(col).append("). ");
             }
 
             this.aspHelper.sb.append("\n");
@@ -261,6 +265,19 @@ public class ASPPlayer {
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
 
+        // Working out how to translate Opponent Command in ASP
+        // Updating Offsets from Opponent's Initial Position
+        String opponentCommand = this.stats.opponentOrders;
+        if (opponentCommand.startsWith("MOVE")) {
+            String dir = opponentCommand.split(" ")[1]; // Estrae la direzione
+            switch (dir) {
+                case "N" -> this.stats.opponentVerticalOffset--;
+                case "S" -> this.stats.opponentVerticalOffset++;
+                case "W" -> this.stats.opponentHorizontalOffset--;
+                case "E" -> this.stats.opponentHorizontalOffset++;
+            }
+        }
+
         // Defining Visited Cells
         for (int row = 0; row < this.gridHeight; row++)
             for (int col = 0; col < this.gridWidth; col++)
@@ -268,23 +285,27 @@ public class ASPPlayer {
                     this.aspHelper.sb.append("visitedCell(").append(row).append(", ").append(col).append("). ");
 
         // Defining Statistics of Current Round
-        this.aspHelper.sb.append("myPos(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
+        this.aspHelper.sb.append("\nmyPos(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
         this.aspHelper.sb.append("myLife(").append(this.stats.myLifeValue).append("). ");
 
-        this.aspHelper.sb.append("oppLife(").append(this.stats.opponentLifeValue).append("). ");
+        this.aspHelper.sb.append("oppLife(").append(this.stats.opponentLifeValue).append(").\n");
 
         this.aspHelper.sb.append("torpedoCooldown(").append(this.stats.torpedoCooldown).append("). ");
         this.aspHelper.sb.append("sonarCooldown(").append(this.stats.sonarCooldown).append("). ");
         this.aspHelper.sb.append("silenceCooldown(").append(this.stats.silenceCooldown).append("). ");
-        this.aspHelper.sb.append("mineCooldown(").append(this.stats.mineCooldown).append("). ");
+        this.aspHelper.sb.append("mineCooldown(").append(this.stats.mineCooldown).append(").\n");
 
         // Detecting of Sonar Scan of Opponent Sector
         if (!this.stats.sonarResult.equals("NA"))
             this.aspHelper.sb.append("oppSector(").append(this.stats.sonarResult).append("). ");
 
+        // Defining Opponent Offsets
+        this.aspHelper.sb.append("oppVerticalOffset(").append(this.stats.opponentVerticalOffset).append("). ");
+        this.aspHelper.sb.append("oppHorizontalOffset(").append(this.stats.opponentHorizontalOffset).append(").\n");
+
         // Detecting of Opponent Action
         if (!this.stats.opponentOrders.equals("NA"))
-            this.aspHelper.sb.append("oppCommand(\"").append(this.stats.opponentOrders).append("\"). ");
+            this.aspHelper.sb.append("oppCommand(\"").append(this.stats.opponentOrders).append("\").\n");
 
         this.aspHelper.mutableFacts = this.aspHelper.sb.toString();
         this.aspHelper.sb.setLength(0);
@@ -306,6 +327,17 @@ public class ASPPlayer {
                         case "E" -> this.gridCells[this.stats.positionY][this.stats.positionX + 1] = 1;
                     }
                 });
+
+        // Update Already Visited Cells to 0 if Surface Action exectued
+        if (actions.contains("SURFACE")) {
+
+            for (int row = 0; row < this.gridHeight; row++)
+                for (int col = 0; col < this.gridWidth; col++)
+                    this.gridCells[row][col] = (this.gridCells[row][col] == 2) ? 2 : 0;
+
+            // Current Position is now the only Visited Cell
+            this.gridCells[this.stats.positionY][this.stats.positionX] = 1;
+        }
 
     }
 
@@ -378,6 +410,10 @@ public class ASPPlayer {
                 else if (obj instanceof Torpedo) {
                     Torpedo torpedo = (Torpedo) obj;
                     commands.add(torpedo.toUpperString());
+                }
+                else if (obj instanceof Surface) {
+                    Surface surface = (Surface) obj;
+                    commands.add(surface.toUpperString());
                 }
             }
             this.printInfoMessage("Commands from ASP: " + commands);

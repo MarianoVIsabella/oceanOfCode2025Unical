@@ -1,6 +1,7 @@
-move(n) | move(s) | move(w) | move(e).
+move(n) | move(s) | move(w) | move(e) | surface.
 
 #show move/1.
+#show surface/0.
 
 moveIntoCell(R-1, C) :- myPos(R, C), move(n).
 moveIntoCell(R+1, C) :- myPos(R, C), move(s).
@@ -9,18 +10,3 @@ moveIntoCell(R, C+1) :- myPos(R, C), move(e).
 
 :- moveIntoCell(R, C), not waterCell(R, C).
 :- moveIntoCell(R, C), visitedCell(R, C).
-
-
-% :- move(n), myPos(_, Y), Y=0.
-% :- move(s), myPos(_, Y), Y=14.
-% :- move(w), myPos(X, _), X=0.
-% :- move(e), myPos(X, _), X=14.
-
-% moveIntoCell(X, Y-1) :- myPos(X, Y), move(n).
-% moveIntoCell(X, Y+1) :- myPos(X, Y), move(s).
-% moveIntoCell(X-1, Y) :- myPos(X, Y), move(w).
-% moveIntoCell(X+1, Y) :- myPos(X, Y), move(e).
-
-% :- moveIntoCell(X, Y), visitedCell(X, Y).
-
-% :- moveIntoCell(X, Y), not waterCell(X, Y).
