@@ -92,7 +92,7 @@ public class ASPPlayer {
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
     protected static final boolean GAME_MODE_ON = false;
     // ---- DEBUG MODE: To be use ONLY when running the Bot.main() as Program
-    protected static final boolean DEBUG_MODE_ON = true;
+    protected static final boolean DEBUG_MODE_ON = false;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
