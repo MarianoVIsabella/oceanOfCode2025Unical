@@ -449,6 +449,7 @@ public class ASPPlayer {
                 else if (obj instanceof Torpedo) {
                     Torpedo torpedo = (Torpedo) obj;
                     commands.add(torpedo.toUpperString());
+                    System.err.println("\n\n\n" + torpedo.toUpperString() + "\n\n\n");
                 }
                 else if (obj instanceof Surface) {
                     Surface surface = (Surface) obj;
