@@ -86,7 +86,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 8;
+    protected int moveUntilEndCounter = 20;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -319,8 +319,21 @@ public class ASPPlayer {
         this.aspHelper.sb.append("oppHorizontalOffset(").append(this.stats.opponentHorizontalOffset).append(").\n");
 
         // Detecting of Opponent Action
-        if (!this.stats.opponentOrders.equals("NA"))
-            this.aspHelper.sb.append("oppCommand(\"").append(this.stats.opponentOrders).append("\").\n");
+
+        // TODO: Modificare il codice per il caso ci siano più azioni (aggiungendo un for?)
+        if (!this.stats.opponentOrders.equals("NA")){
+            // Se è una MOVE, passagli oppMove(X), con X pari alla direzione dell'avversario
+                if(this.stats.opponentOrders.startsWith("MOVE")) {
+                    String dir = this.stats.opponentOrders.split(" ")[1];
+                    this.aspHelper.sb.append("oppMove(\"").append(dir).append("\").\n");
+                }
+                // Se è una SURFACE, passagli oppSurface(X), con X pari al quadrante dove è stata fatta la mossa
+                else if(this.stats.opponentOrders.startsWith("SURFACE")){
+                    String quad = this.stats.opponentOrders.split(" ")[1];
+                    this.aspHelper.sb.append("oppSurface(").append(quad).append(").\n");
+                }
+        }
+        // this.aspHelper.sb.append("oppCommand(\"").append(this.stats.opponentOrders).append("\").\n");
 
         this.aspHelper.mutableFacts = this.aspHelper.sb.toString();
         this.aspHelper.sb.setLength(0);
@@ -417,12 +430,12 @@ public class ASPPlayer {
             return List.of("MOVE S");
 
         for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
-        for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
+        // for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
 
         // Pick Optimal Answer Sets (If there isn't defined any, it throws an Exception)
-        List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
+        //List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
         // If there isn't any weight on ASP Program, use this line
-        // List<AnswerSet> possibleSets = answerSets.getAnswersets();
+        List<AnswerSet> possibleSets = answerSets.getAnswersets();
 
         // If Many Answers, pick one at random
         AnswerSet a = possibleSets.get(this.randomGenerator.nextInt(possibleSets.size()));
