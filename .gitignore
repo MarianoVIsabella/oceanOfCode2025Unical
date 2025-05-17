@@ -1,5 +1,6 @@
 .idea/
 target/
+encodings/myASPPrograms
 
 # Compiled class file
 *.class
@@ -27,5 +28,4 @@ hs_err_pid*
 captainsonar.iml
 src/main/resources/.DS_Store
 src/main/resources/ai/.DS_Store
-src/main/resources/view/assets/.DS_Store
 src/main/resources/view/assets/.DS_Store

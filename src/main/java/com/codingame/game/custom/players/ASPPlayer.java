@@ -83,12 +83,16 @@ public class ASPPlayer {
     protected ASPHelper aspHelper;
 
     protected Scanner in;
+    protected Random randomGenerator;
+
+    // Temporary Variable to Block Program from going above Time Limit
+    protected int moveUntilEndCounter = 8;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
     protected static final boolean GAME_MODE_ON = false;
     // ---- DEBUG MODE: To be use ONLY when running the Bot.main() as Program
-    protected static final boolean DEBUG_MODE_ON = false;
+    protected static final boolean DEBUG_MODE_ON = true;
 
     public static void main(String[] args) { new ASPPlayer().handleGameCycles(); }
 
@@ -118,10 +122,18 @@ public class ASPPlayer {
             this.prepareCurrentInternalState();
 
             // Choose where to move next
-            List<String> actions = this.chooseNextAction();
-            printNextAction(actions);
+            // Temp Block
+            if (this.moveUntilEndCounter > 0) {
+                List<String> actions = this.chooseNextAction();
+                printNextAction(actions);
 
-            this.updateCurrentInternalState(actions);
+                this.moveUntilEndCounter--;
+                this.updateCurrentInternalState(actions);
+            } else {
+                printNextAction(List.of("SURFACE"));
+                this.updateCurrentInternalState(List.of("SURFACE"));
+
+            }
         }
     }
 
@@ -262,6 +274,9 @@ public class ASPPlayer {
     }
 
     protected void prepareCurrentInternalState() {
+        // Declaring Random Generator to choose a Possible Answer if many
+        if (this.randomGenerator == null) this.randomGenerator = new Random();
+
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
 
@@ -353,6 +368,8 @@ public class ASPPlayer {
 //                    return List.of(col, row);
 //
 //        }
+//
+//        return List.of(7,7);
 
         Random random = new Random();
         int possibleRow, possibleCol;
@@ -399,7 +416,16 @@ public class ASPPlayer {
         if (answerSets == null || answerSets.getAnswersets().isEmpty())
             return List.of("MOVE S");
 
-        AnswerSet a = answerSets.getAnswersets().get(0);
+        for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
+        for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
+
+        // Pick Optimal Answer Sets (If there isn't defined any, it throws an Exception)
+        List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
+        // If there isn't any weight on ASP Program, use this line
+        // List<AnswerSet> possibleSets = answerSets.getAnswersets();
+
+        // If Many Answers, pick one at random
+        AnswerSet a = possibleSets.get(this.randomGenerator.nextInt(possibleSets.size()));
 
         try {
             for (Object obj : a.getAtoms()) {
