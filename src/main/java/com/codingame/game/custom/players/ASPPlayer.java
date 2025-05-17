@@ -449,7 +449,6 @@ public class ASPPlayer {
                 else if (obj instanceof Torpedo) {
                     Torpedo torpedo = (Torpedo) obj;
                     commands.add(torpedo.toUpperString());
-                    System.err.println("\n\n\n" + torpedo.toUpperString() + "\n\n\n");
                 }
                 else if (obj instanceof Surface) {
                     Surface surface = (Surface) obj;
@@ -482,6 +481,11 @@ public class ASPPlayer {
             }
 
             if (a.startsWith("MOVE")) {
+                nextAction.insert(0, a);
+                continue;
+            }
+
+            if (a.startsWith("TORPEDO")) {
                 nextAction.insert(0, a);
                 continue;
             }

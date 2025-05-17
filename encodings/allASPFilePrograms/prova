@@ -1,7 +1,13 @@
-move(n, torpedo) | move(s, torpedo) | move(w, torpedo) | move(e, torpedo) | surface.
+move(n, torpedo) | move(s, torpedo) | move(w, torpedo) | move(e, torpedo) | torpedo(X, Y) :- myPos(Y, X).
 
 #show move/2.
 #show surface/0.
+#show torpedo/2.
+
+:- torpedo(_, _), torpedoCooldown(C), C>0.
+
+:- move(_, torpedo), torpedoCooldown(C), C=0.
+
 
 moveIntoCell(R-1, C) :- myPos(R, C), move(n, torpedo).
 moveIntoCell(R+1, C) :- myPos(R, C), move(s, torpedo).

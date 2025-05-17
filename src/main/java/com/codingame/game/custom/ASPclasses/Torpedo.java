@@ -7,6 +7,8 @@ import it.unical.mat.embasp.languages.Param;
 @Id("torpedo")
 public class Torpedo {
 
+    public Torpedo() {}
+
     @Param(0)
     private int X;
 
@@ -43,6 +45,6 @@ public class Torpedo {
     }
 
     public String toUpperString(){
-        return "TORPEDO" + X + " " + Y;
+        return "TORPEDO " + X + " " + Y;
     }
 }
