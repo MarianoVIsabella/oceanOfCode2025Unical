@@ -1,22 +1,25 @@
-move(n, torpedo) | move(s, torpedo) | move(w, torpedo) | move(e, torpedo) | torpedo(X, Y) :- myPos(Y, X).
+move(n) | move(s) | move(w) | move(e).
+
+% { activeTorpedo }.
+activeTorpedo.
+
+powerActive :- activeTorpedo.
 
 #show move/2.
 #show surface/0.
 #show torpedo/2.
 
-:- torpedo(_, _), torpedoCooldown(C), C>0.
-
-:- move(_, torpedo), torpedoCooldown(C), C=0.
-
-
-moveIntoCell(R-1, C) :- myPos(R, C), move(n, torpedo).
-moveIntoCell(R+1, C) :- myPos(R, C), move(s, torpedo).
-moveIntoCell(R, C-1) :- myPos(R, C), move(w, torpedo).
-moveIntoCell(R, C+1) :- myPos(R, C), move(e, torpedo).
+moveIntoCell(R-1, C) :- myPos(R, C), move(n).
+moveIntoCell(R+1, C) :- myPos(R, C), move(s).
+moveIntoCell(R, C-1) :- myPos(R, C), move(w).
+moveIntoCell(R, C+1) :- myPos(R, C), move(e).
 
 :- moveIntoCell(R, C), not waterCell(R, C).
 :- moveIntoCell(R, C), visitedCell(R, C).
 
-move(D, torpedo) :- move(D).
+move(D, nil) :- move(D), not powerActive.
+move(D, torpedo) :- move(D), activeTorpedo.
+
+torpedo(R,C) :- torpedoCooldown(0), myPos(R, C).
 
 :~ move. [1@1]

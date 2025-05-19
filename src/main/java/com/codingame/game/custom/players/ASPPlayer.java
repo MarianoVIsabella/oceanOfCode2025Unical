@@ -86,7 +86,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 25;
+    protected int moveUntilEndCounter = 20;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -321,20 +321,22 @@ public class ASPPlayer {
         // Detecting of Opponent Action
         if (!this.stats.opponentOrders.equals("NA")) {
             // Detecting which action is performed
-            String[] actionPerformed = this.stats.opponentOrders.split(" ");
+            for (String command : this.stats.opponentOrders.split("\\|")) {
+                String[] actionPerformed = command.split(" ");
 
-            // Capitalization of Action's Name
-            this.aspHelper.sb.append("opp")
-                    .append(String.valueOf(actionPerformed[0].charAt(0)).toUpperCase())
-                    .append(actionPerformed[0].substring(1));
+                // Capitalization of Action's Name
+                this.aspHelper.sb.append("opp")
+                        .append(String.valueOf(actionPerformed[0].charAt(0)).toUpperCase())
+                        .append(actionPerformed[0].substring(1).toLowerCase());
 
-            // Inserting Parameters of the Action
-            if (actionPerformed.length > 1) {
-                this.aspHelper.sb.append("(").append(actionPerformed[1]);
-                for (int i = 2; i < actionPerformed.length; i++)
-                    this.aspHelper.sb.append(",").append(String.valueOf(i).toLowerCase());
+                // Inserting Parameters of the Action
+                if (actionPerformed.length > 1) {
+                    this.aspHelper.sb.append("(").append(actionPerformed[1].toLowerCase());
+                    for (int i = 2; i < actionPerformed.length; i++)
+                        this.aspHelper.sb.append(",").append(String.valueOf(i).toLowerCase());
 
-                this.aspHelper.sb.append(")");
+                    this.aspHelper.sb.append(").\n");
+                }
             }
         }
 
@@ -528,7 +530,7 @@ public class ASPPlayer {
         String[] powerActionSplit = powerAction.split(" ");
 
 
-        System.out.println(moveAction + " " + ((powerActionSplit.length == 1) ? powerAction : powerActionSplit[0] + " | " + powerAction));
+        System.out.println(moveAction + " | " + powerAction);
 
 
 

@@ -45,6 +45,6 @@ public class Torpedo {
     }
 
     public String toUpperString(){
-        return "TORPEDO " + X + " " + Y;
+        return "TORPEDO " + Y + " " + X;
     }
 }
