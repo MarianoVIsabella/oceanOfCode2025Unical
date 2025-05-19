@@ -319,8 +319,24 @@ public class ASPPlayer {
         this.aspHelper.sb.append("oppHorizontalOffset(").append(this.stats.opponentHorizontalOffset).append(").\n");
 
         // Detecting of Opponent Action
-        if (!this.stats.opponentOrders.equals("NA"))
-            this.aspHelper.sb.append("oppCommand(\"").append(this.stats.opponentOrders).append("\").\n");
+        if (!this.stats.opponentOrders.equals("NA")) {
+            // Detecting which action is performed
+            String[] actionPerformed = this.stats.opponentOrders.split(" ");
+
+            // Capitalization of Action's Name
+            this.aspHelper.sb.append("opp")
+                    .append(String.valueOf(actionPerformed[0].charAt(0)).toUpperCase())
+                    .append(actionPerformed[0].substring(1));
+
+            // Inserting Parameters of the Action
+            if (actionPerformed.length > 1) {
+                this.aspHelper.sb.append("(").append(actionPerformed[1]);
+                for (int i = 2; i < actionPerformed.length; i++)
+                    this.aspHelper.sb.append(",").append(String.valueOf(i).toLowerCase());
+
+                this.aspHelper.sb.append(")");
+            }
+        }
 
         this.aspHelper.mutableFacts = this.aspHelper.sb.toString();
         this.aspHelper.sb.setLength(0);
