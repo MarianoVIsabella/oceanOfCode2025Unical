@@ -5,7 +5,6 @@ import com.codingame.game.custom.ASPclasses.Surface;
 import com.codingame.game.custom.ASPclasses.Torpedo;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
-import it.unical.mat.embasp.base.OptionDescriptor;
 import it.unical.mat.embasp.base.Output;
 import it.unical.mat.embasp.languages.IllegalAnnotationException;
 import it.unical.mat.embasp.languages.ObjectNotValidException;
@@ -18,6 +17,7 @@ import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  ** Base Class for Input Parsing and Game Cycles Handling, with a few Helper Classes.
@@ -43,7 +43,7 @@ public class ASPPlayer {
                 silenceCooldown = -1,
                 mineCooldown = -1;
 
-        // Powers' Results
+        // Powers' Results & Usage
         public String sonarResult = "NA";
     }
 
@@ -86,7 +86,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 8;
+    protected int moveUntilEndCounter = 25;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -417,7 +417,7 @@ public class ASPPlayer {
             return List.of("MOVE S");
 
         for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
-        for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
+        // for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
 
         // Pick Optimal Answer Sets (If there isn't defined any, it throws an Exception)
         List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
@@ -458,23 +458,64 @@ public class ASPPlayer {
     protected void printNextAction(List<String> actions) {
         this.printInfoMessage("Executing this set of actions: " + actions);
 
-        StringBuilder nextAction = new StringBuilder();
+//        StringBuilder actionsToBeMade = new StringBuilder();
+//
+//        // If Surface, then only possible action is SURFACE
+//        actions.stream()
+//                .filter(command -> command.strip().equals("SURFACE"))
+//                .findFirst()
+//                .ifPresent(surfaceAction -> actionsToBeMade.append("SURFACE"));
+//
+//        if (actionsToBeMade.length() > 0) {
+//            System.out.println(actionsToBeMade);
+//            return;
+//        }
+//
+//        AtomicBoolean isMoveCommandPresent = new AtomicBoolean(false);
+//        // If Move, then add Power Actions with Pipe
+//        actions.stream()
+//                .filter(command -> command.startsWith("MOVE"))
+//                .findFirst()
+//                .ifPresent(moveCommand -> isMoveCommandPresent.set(true));
+//
+//        // Searching through the actions
+//        for (String a : actions) {
+//
+//            if (a.startsWith("MOVE")) {
+//                actionsToBeMade.insert(0, a);
+//            }
+//            else {
+//                if (isM)
+//            }
 
-        for (String a : actions) {
+        //}
 
-            if(a.equals("SURFACE")) {
-                nextAction.append(a);
-                break;
-            }
+        //System.out.println(nextAction);
 
-            if (a.startsWith("MOVE")) {
-                nextAction.insert(0, a);
-                continue;
-            }
-            nextAction.append(" | ").append(a);
+        if (actions.size() == 1) {
+            System.out.println(actions.get(0));
+            return;
         }
 
-        System.out.println(nextAction);
+        String moveAction = "";
+        String powerAction = "";
+
+        if (actions.get(0).startsWith("MOVE")) {
+            moveAction = actions.get(0);
+            powerAction = actions.get(1);
+        }
+        else {
+            moveAction = actions.get(1);
+            powerAction = actions.get(0);
+        }
+
+        String[] powerActionSplit = powerAction.split(" ");
+
+
+        System.out.println(moveAction + " " + ((powerActionSplit.length == 1) ? powerAction : powerActionSplit[0] + " | " + powerAction));
+
+
+
     }
 
 }
