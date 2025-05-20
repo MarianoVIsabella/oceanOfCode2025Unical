@@ -1,25 +1,64 @@
-move(n) | move(s) | move(w) | move(e).
+%%
+%% Input Facts:
+%%
 
-% { activeTorpedo }.
-activeTorpedo.
+%% waterCell(R, C) : cell[R][C] is water, you can move into it.
+%% visitedCell(R, C) : cell[R][C] in which you've moved into.
 
-powerActive :- activeTorpedo.
+%% myPos(R, C) : current Position of the Player.
+%% myLife(N) : current Life Value of the Player.
+%% oppLife(N) : current Life Value of the Opponent Player.
+%% torpedoCooldown(N) : current CoolDown Value of the Power Torpedo.
+%% sonarCooldown(N) : current CoolDown Value of the Power Sonar.
+%% silenceCooldown(N) : current CoolDown Value of the Power Silence.
+%% mineCooldown(N) : current CoolDown Value of the Power Mine.
+%% oppVerticalOffset(N) : current Offset of the Y Position of the Opponent Player relative to its initial Position.
+%% oppHorizontalOffset(N) : current Offset of the X Position of the Opponent Player relative to its initial Position.
+%% oppMove(D) : Opponent's last Move Command with Direction.
+%% oppSurface(S) : Opponent's last Surface Command with Sector Index.
+%% oppTorpedo(R, C) : Opponent's last Torpedo Command with Position.
 
+%%
+%% Output Facts:
+%%
+
+%% move(D, ActivePower). [move/2] : Chosen Direction of the Player, with Power to Activate.
+%% ----- D = [n, s, w, e];
+%% ----- ActivePower = [nil, torpedo];
+%% surface. [surface/0] : Chosen Surface Action.
+
+%% torpedo(Row, Column). [torpedo/2] : Chosen Position to Activate Torpedo Power.
+
+%% Show only these (YOU. SHALL. NOT. TOUCH.)
 #show move/2.
 #show surface/0.
 #show torpedo/2.
 
+%% Choose to move in which direction or to surface.
+move(n) | move(s) | move(w) | move(e) | surface.
+
+%% If Move Action is chosen, a power can be charged.
+{ activeTorpedo } <= 1 :- move(_).
+powerActive :- activeTorpedo.
+
+%% If Surface is chosen, you cannot use any power.
+canUseTorpedo :- not surface.
+
+%% My new Position
 moveIntoCell(R-1, C) :- myPos(R, C), move(n).
 moveIntoCell(R+1, C) :- myPos(R, C), move(s).
 moveIntoCell(R, C-1) :- myPos(R, C), move(w).
 moveIntoCell(R, C+1) :- myPos(R, C), move(e).
 
+%% Cannot move on island or visited cells.
 :- moveIntoCell(R, C), not waterCell(R, C).
 :- moveIntoCell(R, C), visitedCell(R, C).
 
+%% Translating moving and power charging in one predicate.
 move(D, nil) :- move(D), not powerActive.
 move(D, torpedo) :- move(D), activeTorpedo.
 
-torpedo(R,C) :- torpedoCooldown(0), myPos(R, C).
+%% Using some Power
+torpedo(R,C) :- torpedoCooldown(N), N <= 1, canUseTorpedo, myPos(R, C).
 
-:~ move. [1@1]
+:~ surface. [1@1]

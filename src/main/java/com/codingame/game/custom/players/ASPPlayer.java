@@ -86,7 +86,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 20;
+    protected int moveUntilEndCounter = 25;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
