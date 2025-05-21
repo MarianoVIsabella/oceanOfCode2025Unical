@@ -3,17 +3,17 @@ import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
 @Id("move")
-public class Move {
+public class Move implements ASPCommand {
 
-    @Param(0)
-    private String dir;
+    // Parameters
+    @Param(0) private int timeOrder;
+    @Param(1) private String dir;
+    @Param(2) private String power = "nil";
 
-    @Param(1)
-    private String power = "nil";
-
+    // Constructors
     public Move() {}
-
-    public Move(String dir, String power) {
+    public Move(int timeOrder, String dir, String power) {
+        this.timeOrder = timeOrder;
         this.dir = dir;
         this.power = power;
     }
@@ -24,11 +24,19 @@ public class Move {
     public String getPower() { return this.power; }
     public void setPower(String power) { this.power = power; }
 
+    // Time Ordering
+    @Override
+    public int getTimeOrder() { return timeOrder; }
+    @Override
+    public void setTimeOrder(int time) { this.timeOrder = time; }
+
     @Override
     public String toString() {
-        return "move(" + this.dir + ", " + this.power +  ")";
+        return "move(" + this.timeOrder + ", " + this.dir + ", " + this.power +  ")";
     }
 
+    // To Print Command in Game Format
+    @Override
     public String toUpperString(){
         return "MOVE " + dir.toUpperCase() + (this.power.equals("nil") ? "" : " " + this.power.toUpperCase());
     }

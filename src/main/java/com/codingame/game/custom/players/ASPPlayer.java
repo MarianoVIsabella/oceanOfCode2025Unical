@@ -1,5 +1,6 @@
 package com.codingame.game.custom.players;
 
+import com.codingame.game.custom.ASPclasses.ASPCommand;
 import com.codingame.game.custom.ASPclasses.Move;
 import com.codingame.game.custom.ASPclasses.Surface;
 import com.codingame.game.custom.ASPclasses.Torpedo;
@@ -18,6 +19,7 @@ import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  ** Base Class for Input Parsing and Game Cycles Handling, with a few Helper Classes.
@@ -86,7 +88,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 25;
+    protected int moveUntilEndCounter = 20;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -124,13 +126,18 @@ public class ASPPlayer {
             // Choose where to move next
             // Temp Block
             if (this.moveUntilEndCounter > 0) {
-                List<String> actions = this.chooseNextAction();
-                printNextAction(actions);
+                List<ASPCommand> aspCommands = this.chooseNextAction();
+                List<String> actions = aspCommands.stream()
+                            .map(ASPCommand::toUpperString)
+                        .collect(Collectors.toList());
+
+                //List<String> actions = this.chooseNextAction();
+                printNextAction(aspCommands);
 
                 this.moveUntilEndCounter--;
                 this.updateCurrentInternalState(actions);
             } else {
-                printNextAction(List.of("SURFACE"));
+                printNextAction(List.of(new Surface()));
                 this.updateCurrentInternalState(List.of("SURFACE"));
 
             }
@@ -404,14 +411,14 @@ public class ASPPlayer {
     }
 
     // By Default, it tells to Move South and not to use any powers
-    protected List<String> chooseNextAction() {
+    protected List<ASPCommand> chooseNextAction() {
         this.printInfoMessage("Choosing which action to execute");
 
         this.printInfoMessage("ASP Facts:");
         this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
         this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
-        List<String> commands = new ArrayList<>();
+        List<ASPCommand> aspCommands = new ArrayList<>();
 
         // Cleaning Data for ASP Program
         this.aspHelper.handler.removeAll();
@@ -432,48 +439,54 @@ public class ASPPlayer {
         AnswerSets answerSets = (AnswerSets) aspProgramOutput;
 
         if (answerSets == null || answerSets.getAnswersets().isEmpty())
-            return List.of("MOVE S");
+            return List.of(new Move(0,"S", "nil"));
 
         for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
-        // for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
+        for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
 
         // Pick Optimal Answer Sets (If there isn't defined any, it throws an Exception)
         List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
         // If there isn't any weight on ASP Program, use this line
         // List<AnswerSet> possibleSets = answerSets.getAnswersets();
 
-        // If Many Answers, pick one at random
-        AnswerSet a = possibleSets.get(this.randomGenerator.nextInt(possibleSets.size()));
+        printInfoMessage("Number of Optimal Answer Sets: " + possibleSets.size());
+        AnswerSet a = possibleSets.get(0);
 
         try {
             for (Object obj : a.getAtoms()) {
-                if (obj instanceof Move) {
-                    Move move = (Move) obj;
-                    commands.add(move.toUpperString());
-                }
-                else if (obj instanceof Torpedo) {
-                    Torpedo torpedo = (Torpedo) obj;
-                    commands.add(torpedo.toUpperString());
-                }
-                else if (obj instanceof Surface) {
-                    Surface surface = (Surface) obj;
-                    commands.add(surface.toUpperString());
-                }
+
+                if (obj instanceof ASPCommand) { aspCommands.add((ASPCommand) obj); }
+//                if (obj instanceof Move) {
+//                    Move move = (Move) obj;
+//                    // commands.add(move.toUpperString());
+//                    aspCommands.add(move);
+//                }
+//                else if (obj instanceof Torpedo) {
+//                    Torpedo torpedo = (Torpedo) obj;
+//                    // commands.add(torpedo.toUpperString());
+//                    aspCommands.add(torpedo);
+//                }
+//                else if (obj instanceof Surface) {
+//                    Surface surface = (Surface) obj;
+//                    // commands.add(surface.toUpperString());
+//                    aspCommands.add(surface);
+//                }
             }
-            this.printInfoMessage("Commands from ASP: " + commands);
+            this.printInfoMessage("Commands from ASP: " + aspCommands);
         }
         catch (Exception e) {
             this.printInfoMessage("No command from ASP.");
         }
 
-        if (!commands.isEmpty())
-            return Collections.unmodifiableList(commands);
+        this.printInfoMessage("ASP COMMANDS: " + aspCommands);
+        if (!aspCommands.isEmpty())
+            return aspCommands;
 
-        return List.of("MOVE S");
+        return List.of(new Move(0,"S", "nil"));
     }
 
     // It helps to print out the next Actions in Standard Form
-    protected void printNextAction(List<String> actions) {
+    protected void printNextAction(List<ASPCommand> actions) {
         this.printInfoMessage("Executing this set of actions: " + actions);
 
 //        StringBuilder actionsToBeMade = new StringBuilder();
@@ -510,30 +523,40 @@ public class ASPPlayer {
 
         //System.out.println(nextAction);
 
-        if (actions.size() == 1) {
-            System.out.println(actions.get(0));
-            return;
-        }
+//        if (actions.size() == 1) {
+//            System.out.println(actions.get(0));
+//            return;
+//        }
+//
+//        String moveAction = "";
+//        String powerAction = "";
+//
+//        if (actions.get(0).startsWith("MOVE")) {
+//            moveAction = actions.get(0);
+//            powerAction = actions.get(1);
+//        }
+//        else {
+//            moveAction = actions.get(1);
+//            powerAction = actions.get(0);
+//        }
+//
+//        String[] powerActionSplit = powerAction.split(" ");
+//
+//
+//        System.out.println(moveAction + " | " + powerAction);
 
-        String moveAction = "";
-        String powerAction = "";
+        // Sorting Actions by Time Ordering
+        List<ASPCommand> sortedActions = actions.stream()
+                .sorted(Comparator.comparing(ASPCommand::getTimeOrder))
+                .collect(Collectors.toList());
 
-        if (actions.get(0).startsWith("MOVE")) {
-            moveAction = actions.get(0);
-            powerAction = actions.get(1);
-        }
-        else {
-            moveAction = actions.get(1);
-            powerAction = actions.get(0);
-        }
+        String actionsToPrint = (sortedActions.get(0) == null) ? "" : sortedActions.get(0).toUpperString();
 
-        String[] powerActionSplit = powerAction.split(" ");
+        for (int i = 1; i < sortedActions.size(); i++)
+            actionsToPrint += " | " + sortedActions.get(i).toUpperString();
 
 
-        System.out.println(moveAction + " | " + powerAction);
-
-
-
+        System.out.println(actionsToPrint);
     }
 
 }

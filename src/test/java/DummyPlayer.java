@@ -23,8 +23,9 @@ public class DummyPlayer {
         // Write an action using System.out.println()
         // To debug: System.err.println("Debug messages...");
 
-        System.out.println("7 7");
+        System.out.println("7 4");
 
+        int count = 0;
 
         // game loop
         while (true) {
@@ -49,10 +50,12 @@ public class DummyPlayer {
             System.err.println(sonarResult);
             System.err.println(opponentOrders);
 
-            if (y == 2)
-                System.out.println("MOVE E TORPEDO");
-            else
-                System.out.println("MOVE N TORPEDO");
+            if (count < 3) { System.out.println("MOVE S TORPEDO"); }
+            else if (count < 6) { System.out.println("MOVE S MINE"); }
+            else if (count == 6) { System.out.println("SURFACE | MOVE S SILENCE | TORPEDO 7 9 | MOVE N");}
+            else { System.out.println("SURFACE"); }
+
+            count++;
         }
     }
 }

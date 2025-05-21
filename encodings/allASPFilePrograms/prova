@@ -22,43 +22,64 @@
 %% Output Facts:
 %%
 
-%% move(D, ActivePower). [move/2] : Chosen Direction of the Player, with Power to Activate.
-%% ----- D = [n, s, w, e];
+%% move(Time, Direction, ActivePower). [move/3] : Chosen Direction of the Player at time Time, with Power to Activate.
+%% ----- Time : time ordering of the actions
+%% ----- Direction = [n, s, w, e];
 %% ----- ActivePower = [nil, torpedo];
-%% surface. [surface/0] : Chosen Surface Action.
 
-%% torpedo(Row, Column). [torpedo/2] : Chosen Position to Activate Torpedo Power.
+%% surface(Time). [surface/1] : Chosen Surface Action at time Time.
+%% ----- Time : time ordering of the actions
+
+%% torpedo(Time, Row, Column). [torpedo/3] : Chosen Position to fire Torpedo at time Time.
+%% ----- Time : time ordering of the actions
+%% ----- Row : Row (Y) of Position in which Player fired Torpedo.
+%% ----- Column : Column (X) of Position in which Player fired Torpedo.
 
 %% Show only these (YOU. SHALL. NOT. TOUCH.)
-#show move/2.
-#show surface/0.
-#show torpedo/2.
+#show move/3.
+#show surface/1.
+#show torpedo/3.
 
-%% Choose to move in which direction or to surface.
-move(n) | move(s) | move(w) | move(e) | surface.
+%% Number of Actions that can be made.
+time(1..3).
+directions(n). directions(s). directions(w). directions(e).
 
-%% If Move Action is chosen, a power can be charged.
-{ activeTorpedo } <= 1 :- move(_).
-powerActive :- activeTorpedo.
+%% Each time, the Player can choose between this set of Actions.
+moveAction(T) | surface(T) | firePower(T) | noAction(T) :- time(T).
+{ move(T, D) : directions(D) } = 1 :- moveAction(T).
+{ fireTorpedo(T) } = 1 :- firePower(T).
 
-%% If Surface is chosen, you cannot use any power.
-canUseTorpedo :- not surface.
+%% No action can be made twice.
+:- surface(T1), surface(T2), T1 != T2.
+:- fireTorpedo(T1), fireTorpedo(T2), T1 != T2.
+:- moveAction(T1), moveAction(T2), T1 != T2.
+:- noAction(T1), not noAction(T2), T2 = T1 + 1, T2 <= 3.
+:- noAction(1).
 
-%% My new Position
-moveIntoCell(R-1, C) :- myPos(R, C), move(n).
-moveIntoCell(R+1, C) :- myPos(R, C), move(s).
-moveIntoCell(R, C-1) :- myPos(R, C), move(w).
-moveIntoCell(R, C+1) :- myPos(R, C), move(e).
+%% Player's new Position
+moveIntoCell(R-1, C) :- myPos(R, C), move(_, n).
+moveIntoCell(R+1, C) :- myPos(R, C), move(_, s).
+moveIntoCell(R, C-1) :- myPos(R, C), move(_, w).
+moveIntoCell(R, C+1) :- myPos(R, C), move(_, e).
 
-%% Cannot move on island or visited cells.
+%% Cannot move on islands or visited cells.
 :- moveIntoCell(R, C), not waterCell(R, C).
 :- moveIntoCell(R, C), visitedCell(R, C).
 
+%% If Move Action is chosen, a power can be charged.
+activeTorpedo(T)  :- move(T, _).
+powerActive(T) :- activeTorpedo(T).
+
 %% Translating moving and power charging in one predicate.
-move(D, nil) :- move(D), not powerActive.
-move(D, torpedo) :- move(D), activeTorpedo.
+move(T, D, nil) :- move(T, D), not powerActive(T).
+move(T, D, torpedo) :- move(T, D), activeTorpedo(T).
 
 %% Using some Power
-torpedo(R,C) :- torpedoCooldown(N), N <= 1, canUseTorpedo, myPos(R, C).
+torpedo(T, R, C) :- torpedoCooldown(0), fireTorpedo(T), myPos(R, C).
+torpedo(T, R, C) :- torpedoCooldown(1), move(T1, _, torpedo), fireTorpedo(T), T1 < T, myPos(R, C).
 
-:~ surface. [1@1]
+% :~ adessoPiango. [1@1]
+:~ surface(T). [1@1]
+% :~ time(T), not fireTorpedo(T). [1@2, T]
+
+:- fireTorpedo(_), torpedoCooldown(N), N > 1.
