@@ -13,6 +13,15 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.codingame</groupId>
+            <artifactId>gameengine</artifactId>
+            <version>prova-1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/core-prova-1.0.0.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>com.codingame.gameengine</groupId>
             <artifactId>core</artifactId>

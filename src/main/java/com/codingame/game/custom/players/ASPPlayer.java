@@ -88,7 +88,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 20;
+    protected int moveUntilEndCounter = 200;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -415,7 +415,7 @@ public class ASPPlayer {
         this.printInfoMessage("Choosing which action to execute");
 
         this.printInfoMessage("ASP Facts:");
-        this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
+        // this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
         this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
         List<ASPCommand> aspCommands = new ArrayList<>();
