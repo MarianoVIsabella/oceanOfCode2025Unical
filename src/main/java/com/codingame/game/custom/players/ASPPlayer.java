@@ -340,7 +340,7 @@ public class ASPPlayer {
                 if (actionPerformed.length > 1) {
                     this.aspHelper.sb.append("(").append(actionPerformed[1].toLowerCase());
                     for (int i = 2; i < actionPerformed.length; i++)
-                        this.aspHelper.sb.append(",").append(String.valueOf(i).toLowerCase());
+                        this.aspHelper.sb.append(",").append(actionPerformed[i].toLowerCase());
 
                     this.aspHelper.sb.append(").\n");
                 }

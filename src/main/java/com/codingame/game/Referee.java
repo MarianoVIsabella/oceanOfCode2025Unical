@@ -31,7 +31,7 @@ public class Referee extends AbstractReferee implements IPlayerManager {
 	public void init() {
 		// gameManager.setFirstTurnMaxTime(1000);
 		gameManager.setTurnMaxTime(450);
-		gameManager.setMaxTurns(300);
+		gameManager.setMaxTurns(600);
 		
 		System.err.println(Long.parseLong(gameManager.getGameParameters().get("seed").toString()));
 		long seed = gameManager.getSeed();

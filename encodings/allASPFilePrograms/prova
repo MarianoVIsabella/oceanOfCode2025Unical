@@ -63,8 +63,8 @@ moveIntoCell(R, C-1) :- myPos(R, C), move(_, w).
 moveIntoCell(R, C+1) :- myPos(R, C), move(_, e).
 
 %% Cannot move on islands or visited cells.
-:- moveIntoCell(R, C), not waterCell(R, C).
-:- moveIntoCell(R, C), visitedCell(R, C).
+%:- moveIntoCell(R, C), not waterCell(R, C).
+%:- moveIntoCell(R, C), visitedCell(R, C).
 
 %% If Move Action is chosen, a power can be charged.
 activeTorpedo(T)  :- move(T, _).
@@ -75,11 +75,11 @@ move(T, D, nil) :- move(T, D), not powerActive(T).
 move(T, D, torpedo) :- move(T, D), activeTorpedo(T).
 
 %% Using some Power
-torpedo(T, 1, 1) :- torpedoCooldown(0), fireTorpedo(T), myPos(R, C).
-torpedo(T, 1, 1) :- torpedoCooldown(1), move(T1, _, torpedo), fireTorpedo(T), T1 < T, myPos(R, C).
+%torpedo(T, 1, 1) :- torpedoCooldown(0), fireTorpedo(T), myPos(R, C).
+%torpedo(T, 1, 1) :- torpedoCooldown(1), move(T1, _, torpedo), fireTorpedo(T), T1 < T, myPos(R, C).
 
 % :~ adessoPiango. [1@1]
-:~ surface(T). [1@1]
+%:~ surface(T). [1@1]
 :~ time(T), not fireTorpedo(T). [1@2, T]
 
 :- fireTorpedo(_), torpedoCooldown(N), N > 1.
