@@ -3,6 +3,8 @@ package com.codingame.game.custom.data;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
+import java.util.Objects;
+
 @Id("minedCell")
 public class MinedCell {
 
@@ -18,6 +20,18 @@ public class MinedCell {
 
     public int getRow() { return this.row; }
     public int getColumn() { return this.column; }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MinedCell minedCell = (MinedCell) o;
+        return row == minedCell.row && column == minedCell.column;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(row, column); }
 
     @Override
     public String toString() {

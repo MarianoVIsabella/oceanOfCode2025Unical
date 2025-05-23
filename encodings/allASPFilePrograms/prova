@@ -1,26 +1,39 @@
-%%
-%% Input Facts:
-%%
+%% -------------------------------------------------------------------------------
+%% --------------------------------- Input Facts ---------------------------------
+%% -------------------------------------------------------------------------------
 
 %% waterCell(R, C) : cell[R][C] is water, you can move into it.
 %% visitedCell(R, C) : cell[R][C] in which you've moved into.
 
 %% myPos(R, C) : current Position of the Player.
+
 %% myLife(N) : current Life Value of the Player.
 %% oppLife(N) : current Life Value of the Opponent Player.
+
 %% torpedoCooldown(N) : current CoolDown Value of the Power Torpedo.
 %% sonarCooldown(N) : current CoolDown Value of the Power Sonar.
 %% silenceCooldown(N) : current CoolDown Value of the Power Silence.
 %% mineCooldown(N) : current CoolDown Value of the Power Mine.
+
 %% oppVerticalOffset(N) : current Offset of the Y Position of the Opponent Player relative to its initial Position.
 %% oppHorizontalOffset(N) : current Offset of the X Position of the Opponent Player relative to its initial Position.
-%% oppMove(D) : Opponent's last Move Command with Direction.
-%% oppSurface(S) : Opponent's last Surface Command with Sector Index.
-%% oppTorpedo(R, C) : Opponent's last Torpedo Command with Position.
 
-%%
-%% Output Facts:
-%%
+%% oppMove(T, D) : Opponent's last Move Command with Direction at time T.
+%% oppSurface(T, S) : Opponent's last Surface Command with Sector Index at time T.
+%% oppTorpedo(T, R, C) : Opponent's last Torpedo Command with Position at Time T.
+%% oppMine(T, D) : Opponent's last Mine Command with Direction at time T.
+%% oppTrigger(T, R, C) : Opponent's last Trigger Command with Position at Time T.
+
+%% ----- Utils in input
+%% actionSlot(T) : Defines the number of (single, non-repeatable) Actions can be made in a single Round
+%% directions(D) : Defines the Cardinal Directions as ASP Symbols.
+%% sectors(S, CR, CC) : Defines Sectors of the Map, with Center Position (Row and Column)
+%% torpedoRangeOffsets(DR, DC) : Defines Range Offsets from the Player's Position for the Torpedo Power
+
+
+%% -------------------------------------------------------------------------------
+%% -------------------------------- Output Facts ---------------------------------
+%% -------------------------------------------------------------------------------
 
 %% move(Time, Direction, ActivePower). [move/3] : Chosen Direction of the Player at time Time, with Power to Activate.
 %% ----- Time : time ordering of the actions
@@ -35,17 +48,26 @@
 %% ----- Row : Row (Y) of Position in which Player fired Torpedo.
 %% ----- Column : Column (X) of Position in which Player fired Torpedo.
 
+%% mine(Time, Direction). [mine/2] : Chosen Direction to Mine by the Player at time Time.
+%% ----- Time : time ordering of the actions
+%% ----- Direction = [n, s, w, e];
+
+%% trigger(Time, Row, Column). [trigger/3] : Chosen Position of Mine to Trigger at time Time.
+%% ----- Time : time ordering of the actions
+%% ----- Row : Row (Y) of Position of the chosen Mine.
+%% ----- Column : Column (X) of Position of the chosen Mine.
+
 %% Show only these (YOU. SHALL. NOT. TOUCH.)
 #show move/3.
 #show surface/1.
 #show torpedo/3.
+#show mine/2.
+#show trigger/3.
 
-%% Number of Actions that can be made.
-time(1..3).
-directions(n). directions(s). directions(w). directions(e).
+waterCell(R, C) :- waterCell(R, C, S).
 
 %% Each time, the Player can choose between this set of Actions.
-moveAction(T) | surface(T) | firePower(T) | noAction(T) :- time(T).
+moveAction(T) | surface(T) | firePower(T) | noAction(T) :- actionSlot(T).
 { move(T, D) : directions(D) } = 1 :- moveAction(T).
 { fireTorpedo(T) } = 1 :- firePower(T).
 
@@ -80,6 +102,6 @@ move(T, D, torpedo) :- move(T, D), activeTorpedo(T).
 
 % :~ adessoPiango. [1@1]
 %:~ surface(T). [1@1]
-:~ time(T), not fireTorpedo(T). [1@2, T]
+:~ actionSlot(T), not fireTorpedo(T). [1@2, T]
 
 :- fireTorpedo(_), torpedoCooldown(N), N > 1.

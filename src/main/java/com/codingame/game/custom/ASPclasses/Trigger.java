@@ -39,6 +39,6 @@ public class Trigger implements ASPCommand {
     // To Print Command in Game Format
     @Override
     public String toUpperString() {
-        return String.format("TRIGGER %d %d", this.row, this.column);
+        return String.format("TRIGGER %d %d", this.column, this.row);
     }
 }

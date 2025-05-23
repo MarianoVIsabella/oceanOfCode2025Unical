@@ -1,9 +1,7 @@
 package com.codingame.game.custom.players;
 
-import com.codingame.game.custom.ASPclasses.ASPCommand;
-import com.codingame.game.custom.ASPclasses.Move;
-import com.codingame.game.custom.ASPclasses.Surface;
-import com.codingame.game.custom.ASPclasses.Torpedo;
+import com.codingame.game.custom.ASPclasses.*;
+import com.codingame.game.custom.data.MinedCell;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
 import it.unical.mat.embasp.base.Output;
@@ -18,7 +16,6 @@ import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +29,7 @@ public class ASPPlayer {
         // Current Player Stats
         public int positionX = -1, positionY = -1;
         public int myLifeValue = 6;
+        public List<MinedCell> minedCells;
 
         // Opponent Player Stats
         public int opponentLifeValue = 6;
@@ -47,6 +45,10 @@ public class ASPPlayer {
 
         // Powers' Results & Usage
         public String sonarResult = "NA";
+
+        public Statistics() {
+            this.minedCells = new ArrayList<>();
+        }
     }
 
     public static class ASPHelper {
@@ -88,7 +90,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 200;
+    protected int moveUntilEndCounter = 50;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -135,10 +137,10 @@ public class ASPPlayer {
                 printNextAction(aspCommands);
 
                 this.moveUntilEndCounter--;
-                this.updateCurrentInternalState(actions);
+                this.updateCurrentInternalState(aspCommands);
             } else {
-                printNextAction(List.of(new Surface()));
-                this.updateCurrentInternalState(List.of("SURFACE"));
+                printNextAction(List.of(new Surface(0)));
+                this.updateCurrentInternalState(List.of(new Surface(0)));
 
             }
         }
@@ -156,9 +158,16 @@ public class ASPPlayer {
 
         // Inserting Predicate Classes into ASP Mapper
         try {
+            // Basic Movement Classes
             ASPMapper.getInstance().registerClass(Move.class);
-            ASPMapper.getInstance().registerClass(Torpedo.class);
             ASPMapper.getInstance().registerClass(Surface.class);
+
+            // Torpedo Power
+            ASPMapper.getInstance().registerClass(Torpedo.class);
+
+            // Mine Power
+            ASPMapper.getInstance().registerClass(Mine.class);
+            ASPMapper.getInstance().registerClass(Trigger.class);
         }
         catch (ObjectNotValidException | IllegalAnnotationException e1) {
             System.err.println(Arrays.toString(e1.getStackTrace()));
@@ -254,15 +263,37 @@ public class ASPPlayer {
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
 
-        // Defining Water Cells
+        // Defining Water Cells of the Map
         for (int row = 0; row < this.gridHeight; row++) {
             for (int col = 0; col < this.gridWidth; col++) {
                 if (this.gridCells[row][col] != 2)
-                    this.aspHelper.sb.append("waterCell(").append(row).append(", ").append(col).append("). ");
+                    this.aspHelper.sb.append("waterCell(")
+                            .append(row).append(", ").append(col).append(", ")
+                            // Sector Calculation
+                            .append((3 * row + col)/5 + 1).append("). ");
             }
 
             this.aspHelper.sb.append("\n");
         }
+
+        this.aspHelper.sb
+                // Defining Actions' Slot that can be used
+                .append("actionSlot(1..5).\n")
+
+                // Defining Cardinal Directions
+                .append("directions(n). directions(s). directions(w). directions(e).\n")
+
+                .append("sectors(1, 2,2). sectors(2, 2,7). sectors(3, 2,12).")
+                .append("sectors(4, 7,2). sectors(5, 7,7). sectors(6, 7,12).")
+                .append("sectors(7, 12,2). sectors(8, 12,7). sectors(9, 12,12).")
+
+                // Defining Torpedo Range Offsets
+                .append("torpedoRangeOffsets(-2..2, -2..2).")
+                .append("torpedoRangeOffsets(-3, -1..1). torpedoRangeOffsets(3, -1..1).")
+                .append("torpedoRangeOffsets(-1..1, -3). torpedoRangeOffsets(-1..1, 3).")
+                .append("torpedoRangeOffsets(-4, 0). torpedoRangeOffsets(4, 0).")
+                .append("torpedoRangeOffsets(0, -4). torpedoRangeOffsets(0, 4).\n");
+
 
         this.aspHelper.immutableFacts = this.aspHelper.sb.toString();
 
@@ -289,16 +320,19 @@ public class ASPPlayer {
 
         // Working out how to translate Opponent Command in ASP
         // Updating Offsets from Opponent's Initial Position
-        String opponentCommand = this.stats.opponentOrders;
-        if (opponentCommand.startsWith("MOVE")) {
-            String dir = opponentCommand.split(" ")[1]; // Estrae la direzione
-            switch (dir) {
-                case "N" -> this.stats.opponentVerticalOffset--;
-                case "S" -> this.stats.opponentVerticalOffset++;
-                case "W" -> this.stats.opponentHorizontalOffset--;
-                case "E" -> this.stats.opponentHorizontalOffset++;
-            }
-        }
+        Arrays.stream(this.stats.opponentOrders.split("\\|"))
+                .filter(command -> command.startsWith("MOVE"))
+                .map(command -> command.split(" ")[1]) // Chosen Direction
+                .findFirst()
+                .ifPresent(dir -> {
+                    switch (dir) {
+                        case "N" -> this.stats.opponentVerticalOffset--;
+                        case "S" -> this.stats.opponentVerticalOffset++;
+                        case "W" -> this.stats.opponentHorizontalOffset--;
+                        case "E" -> this.stats.opponentHorizontalOffset++;
+                    }
+                });
+
 
         // Defining Visited Cells
         for (int row = 0; row < this.gridHeight; row++)
@@ -306,8 +340,15 @@ public class ASPPlayer {
                 if (this.gridCells[row][col] == 1)
                     this.aspHelper.sb.append("visitedCell(").append(row).append(", ").append(col).append("). ");
 
+        this.aspHelper.sb.append("\n");
+
+        // Defining Mined Cells
+        for (MinedCell minedCell : this.stats.minedCells) this.aspHelper.sb.append(minedCell).append(". ");
+
+        this.aspHelper.sb.append("\n");
+
         // Defining Statistics of Current Round
-        this.aspHelper.sb.append("\nmyPos(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
+        this.aspHelper.sb.append("myPos(").append(this.stats.positionY).append(", ").append(this.stats.positionX).append("). ");
         this.aspHelper.sb.append("myLife(").append(this.stats.myLifeValue).append("). ");
 
         this.aspHelper.sb.append("oppLife(").append(this.stats.opponentLifeValue).append(").\n");
@@ -327,6 +368,7 @@ public class ASPPlayer {
 
         // Detecting of Opponent Action
         if (!this.stats.opponentOrders.equals("NA")) {
+            int timeCounter = 1;
             // Detecting which action is performed
             for (String command : this.stats.opponentOrders.split("\\|")) {
                 String[] actionPerformed = command.split(" ");
@@ -336,14 +378,24 @@ public class ASPPlayer {
                         .append(String.valueOf(actionPerformed[0].charAt(0)).toUpperCase())
                         .append(actionPerformed[0].substring(1).toLowerCase());
 
-                // Inserting Parameters of the Action
-                if (actionPerformed.length > 1) {
-                    this.aspHelper.sb.append("(").append(actionPerformed[1].toLowerCase());
-                    for (int i = 2; i < actionPerformed.length; i++)
-                        this.aspHelper.sb.append(",").append(actionPerformed[i].toLowerCase());
+                // Inserting Time Ordering of Action
+                this.aspHelper.sb.append("(").append(timeCounter);
 
-                    this.aspHelper.sb.append(").\n");
+                // Inserting Parameters of the Action
+                if (actionPerformed.length == 2) {
+                    // Move, Mine Commands have only one parameter
+                    this.aspHelper.sb.append(",").append(actionPerformed[1].toLowerCase());
                 }
+                else if (actionPerformed.length > 2) {
+                    // Torpedo, Trigger Commands have two parameters (col and row)
+                    // that needs to be switched to be in order
+
+                        this.aspHelper.sb.append(",").append(actionPerformed[2].toLowerCase())
+                                         .append(",").append(actionPerformed[1].toLowerCase());
+                }
+
+                this.aspHelper.sb.append(").\n");
+                timeCounter++;
             }
         }
 
@@ -352,33 +404,59 @@ public class ASPPlayer {
 
     }
 
-    protected void updateCurrentInternalState(List<String> actions) {
+    protected void updateCurrentInternalState(List<ASPCommand> actions) {
 
-        // Update Position Based on Chosen Moving Directions
-        actions.stream()
-                .filter(command -> command.startsWith("MOVE"))
-                .map(command -> command.split(" ")[1]) // Chosen Direction
-                .findFirst()
-                .ifPresent(dir -> {
-                    switch (dir) {
-                        case "N" -> this.gridCells[this.stats.positionY - 1][this.stats.positionX] = 1;
-                        case "S" -> this.gridCells[this.stats.positionY + 1][this.stats.positionX] = 1;
-                        case "W" -> this.gridCells[this.stats.positionY][this.stats.positionX - 1] = 1;
-                        case "E" -> this.gridCells[this.stats.positionY][this.stats.positionX + 1] = 1;
-                    }
-                });
+        for (ASPCommand command : actions) {
+            if (command instanceof Move) {
+                Move moveCommand = (Move) command;
 
-        // Update Already Visited Cells to 0 if Surface Action exectued
-        if (actions.contains("SURFACE")) {
+                // Update Position Based on Chosen Moving Directions
+                switch (moveCommand.getDir().toUpperCase()) {
+                    case "N" -> this.stats.positionY -= 1;
+                    case "S" -> this.stats.positionY += 1;
+                    case "W" -> this.stats.positionX -= 1;
+                    case "E" -> this.stats.positionX += 1;
+                }
 
-            for (int row = 0; row < this.gridHeight; row++)
-                for (int col = 0; col < this.gridWidth; col++)
-                    this.gridCells[row][col] = (this.gridCells[row][col] == 2) ? 2 : 0;
+                // Updating Current Visited Cell
+                this.gridCells[this.stats.positionY][this.stats.positionX] = 1;
 
-            // Current Position is now the only Visited Cell
-            this.gridCells[this.stats.positionY][this.stats.positionX] = 1;
+            }
+            else if (command instanceof Surface) {
+                // Update Already Visited Cells to 0 if Surface Action executed
+                for (int row = 0; row < this.gridHeight; row++)
+                    for (int col = 0; col < this.gridWidth; col++)
+                        this.gridCells[row][col] = (this.gridCells[row][col] == 2) ? 2 : 0;
+
+                // Current Position is now the only Visited Cell
+                this.gridCells[this.stats.positionY][this.stats.positionX] = 1;
+
+            }
+            else if (command instanceof Mine) {
+                Mine mineCommand = (Mine) command;
+
+                int row = this.stats.positionY, col = this.stats.positionX;
+
+                // Detecting Mine Position Based on Current Player Position and Throwing Direction
+                switch (mineCommand.getDir().toUpperCase()) {
+                    case "N" -> row -= 1;
+                    case "S" -> row += 1;
+                    case "W" -> col -= 1;
+                    case "E" -> col += 1;
+                }
+
+                // Registering new placed Mine
+                this.stats.minedCells.add(new MinedCell(row, col));
+
+            }
+            else if (command instanceof Trigger) {
+                Trigger triggerCommand = (Trigger) command;
+
+                // Triggered Mine is not usable anymore
+                this.stats.minedCells.remove(new MinedCell(triggerCommand.getRow(), triggerCommand.getColumn()));
+
+            }
         }
-
     }
 
 
@@ -415,7 +493,7 @@ public class ASPPlayer {
         this.printInfoMessage("Choosing which action to execute");
 
         this.printInfoMessage("ASP Facts:");
-        // this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
+        this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
         this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
         List<ASPCommand> aspCommands = new ArrayList<>();
@@ -480,7 +558,10 @@ public class ASPPlayer {
 
         this.printInfoMessage("ASP COMMANDS: " + aspCommands);
         if (!aspCommands.isEmpty())
-            return aspCommands;
+            // Returning Sorted Actions by Time Ordering
+            return aspCommands.stream()
+                    .sorted(Comparator.comparing(ASPCommand::getTimeOrder))
+                    .collect(Collectors.toList());
 
         return List.of(new Move(0,"S", "nil"));
     }
@@ -489,71 +570,12 @@ public class ASPPlayer {
     protected void printNextAction(List<ASPCommand> actions) {
         this.printInfoMessage("Executing this set of actions: " + actions);
 
-//        StringBuilder actionsToBeMade = new StringBuilder();
-//
-//        // If Surface, then only possible action is SURFACE
-//        actions.stream()
-//                .filter(command -> command.strip().equals("SURFACE"))
-//                .findFirst()
-//                .ifPresent(surfaceAction -> actionsToBeMade.append("SURFACE"));
-//
-//        if (actionsToBeMade.length() > 0) {
-//            System.out.println(actionsToBeMade);
-//            return;
-//        }
-//
-//        AtomicBoolean isMoveCommandPresent = new AtomicBoolean(false);
-//        // If Move, then add Power Actions with Pipe
-//        actions.stream()
-//                .filter(command -> command.startsWith("MOVE"))
-//                .findFirst()
-//                .ifPresent(moveCommand -> isMoveCommandPresent.set(true));
-//
-//        // Searching through the actions
-//        for (String a : actions) {
-//
-//            if (a.startsWith("MOVE")) {
-//                actionsToBeMade.insert(0, a);
-//            }
-//            else {
-//                if (isM)
-//            }
+        StringBuilder actionsToPrint = new StringBuilder(
+                (actions.isEmpty() || actions.get(0) == null) ? "" : actions.get(0).toUpperString()
+        );
 
-        //}
-
-        //System.out.println(nextAction);
-
-//        if (actions.size() == 1) {
-//            System.out.println(actions.get(0));
-//            return;
-//        }
-//
-//        String moveAction = "";
-//        String powerAction = "";
-//
-//        if (actions.get(0).startsWith("MOVE")) {
-//            moveAction = actions.get(0);
-//            powerAction = actions.get(1);
-//        }
-//        else {
-//            moveAction = actions.get(1);
-//            powerAction = actions.get(0);
-//        }
-//
-//        String[] powerActionSplit = powerAction.split(" ");
-//
-//
-//        System.out.println(moveAction + " | " + powerAction);
-
-        // Sorting Actions by Time Ordering
-        List<ASPCommand> sortedActions = actions.stream()
-                .sorted(Comparator.comparing(ASPCommand::getTimeOrder))
-                .collect(Collectors.toList());
-
-        String actionsToPrint = (sortedActions.get(0) == null) ? "" : sortedActions.get(0).toUpperString();
-
-        for (int i = 1; i < sortedActions.size(); i++)
-            actionsToPrint += " | " + sortedActions.get(i).toUpperString();
+        for (int i = 1; i < actions.size(); i++)
+            actionsToPrint.append(" | ").append(actions.get(i).toUpperString());
 
 
         System.out.println(actionsToPrint);
