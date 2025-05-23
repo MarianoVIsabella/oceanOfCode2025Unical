@@ -270,7 +270,7 @@ public class ASPPlayer {
                     this.aspHelper.sb.append("waterCell(")
                             .append(row).append(", ").append(col).append(", ")
                             // Sector Calculation
-                            .append((3 * row + col)/5 + 1).append("). ");
+                            .append(3 * (row/5) + (col/5) + 1).append("). ");
             }
 
             this.aspHelper.sb.append("\n");
