@@ -23,39 +23,45 @@
 %% oppTorpedo(T, R, C) : Opponent's last Torpedo Command with Position at Time T.
 %% oppMine(T, D) : Opponent's last Mine Command with Direction at time T.
 %% oppTrigger(T, R, C) : Opponent's last Trigger Command with Position at Time T.
+%% oppSector(S) : Positive Result of Sonar Power on the Sector S (at Previous Round).
+%% oppNoSector(S) : Negative Result of Sonar Power on the Sector S (at Previous Round).
 
 %% ----- Utils in input
 %% actionSlot(T) : Defines the number of (single, non-repeatable) Actions can be made in a single Round
-%% directions(D) : Defines the Cardinal Directions as ASP Symbols.
-%% sectors(S, CR, CC) : Defines Sectors of the Map, with Center Position (Row and Column)
-%% torpedoRangeOffsets(DR, DC) : Defines Range Offsets from the Player's Position for the Torpedo Power
-
+%% direction(D, DR, DC) : Defines the Cardinal Directions as ASP Symbols with Offsets Position.
+%% sector(S, CR, CC) : Defines Sectors of the Map, with Center Position (Row and Column).
+%% power(P) : Defines Power that can be used during the Game (noPower -> nil).
+%% torpedoRangeOffset(DR, DC) : Defines Range Offsets from the Player's Position for the Torpedo Power.
 
 %% -------------------------------------------------------------------------------
 %% -------------------------------- Output Facts ---------------------------------
 %% -------------------------------------------------------------------------------
 
 %% move(Time, Direction, ActivePower). [move/3] : Chosen Direction of the Player at time Time, with Power to Activate.
-%% ----- Time : time ordering of the actions
+%% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
 %% ----- Direction = [n, s, w, e];
 %% ----- ActivePower = [nil, torpedo];
 
 %% surface(Time). [surface/1] : Chosen Surface Action at time Time.
-%% ----- Time : time ordering of the actions
+%% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
 
 %% torpedo(Time, Row, Column). [torpedo/3] : Chosen Position to fire Torpedo at time Time.
-%% ----- Time : time ordering of the actions
+%% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
 %% ----- Row : Row (Y) of Position in which Player fired Torpedo.
 %% ----- Column : Column (X) of Position in which Player fired Torpedo.
 
 %% mine(Time, Direction). [mine/2] : Chosen Direction to Mine by the Player at time Time.
-%% ----- Time : time ordering of the actions
+%% ----- Time : [by actionSlot(Time)]  (time ordering of the actions)
 %% ----- Direction = [n, s, w, e];
 
 %% trigger(Time, Row, Column). [trigger/3] : Chosen Position of Mine to Trigger at time Time.
-%% ----- Time : time ordering of the actions
+%% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
 %% ----- Row : Row (Y) of Position of the chosen Mine.
 %% ----- Column : Column (X) of Position of the chosen Mine.
+
+%% sonar(Time, Sector). [sonar/2] : Chosen Sector to Scan with Sonar at time Time.
+%% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
+%% ----- Sector = [1, 2, ..., 9];
 
 %% Show only these (YOU. SHALL. NOT. TOUCH.)
 #show move/3.
@@ -63,6 +69,7 @@
 #show torpedo/3.
 #show mine/2.
 #show trigger/3.
+#show sonar/2.
 
 waterCell(R, C) :- waterCell(R, C, S).
 

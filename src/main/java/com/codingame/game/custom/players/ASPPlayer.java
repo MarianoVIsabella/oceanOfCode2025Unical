@@ -45,6 +45,7 @@ public class ASPPlayer {
 
         // Powers' Results & Usage
         public String sonarResult = "NA";
+        public int sectorAsked = -1;
 
         public Statistics() {
             this.minedCells = new ArrayList<>();
@@ -168,9 +169,12 @@ public class ASPPlayer {
             // Mine Power
             ASPMapper.getInstance().registerClass(Mine.class);
             ASPMapper.getInstance().registerClass(Trigger.class);
+
+            // Sonar Power
+            ASPMapper.getInstance().registerClass(Sonar.class);
         }
-        catch (ObjectNotValidException | IllegalAnnotationException e1) {
-            System.err.println(Arrays.toString(e1.getStackTrace()));
+        catch (ObjectNotValidException | IllegalAnnotationException e) {
+            System.err.println(Arrays.toString(e.getStackTrace()));
         }
 
         // Declaring Container for Program Inputs
@@ -281,18 +285,22 @@ public class ASPPlayer {
                 .append("actionSlot(1..5).\n")
 
                 // Defining Cardinal Directions
-                .append("directions(n). directions(s). directions(w). directions(e).\n")
+                .append("direction(n, -1,0). direction(s, 1,0). direction(w, 0,-1). direction(e, 0,1).\n")
 
-                .append("sectors(1, 2,2). sectors(2, 2,7). sectors(3, 2,12).")
+                // Defining Sectors of the Map, with Center Positions
+                .append("sector(1, 2,2). sectors(2, 2,7). sectors(3, 2,12).")
                 .append("sectors(4, 7,2). sectors(5, 7,7). sectors(6, 7,12).")
-                .append("sectors(7, 12,2). sectors(8, 12,7). sectors(9, 12,12).")
+                .append("sectors(7, 12,2). sectors(8, 12,7). sectors(9, 12,12).\n")
+
+                // Defining Power that can be used during the Game
+                .append("power(torpedo). power(mine). power(trigger). powers(sonar). powers(nil).\n")
 
                 // Defining Torpedo Range Offsets
-                .append("torpedoRangeOffsets(-2..2, -2..2).")
-                .append("torpedoRangeOffsets(-3, -1..1). torpedoRangeOffsets(3, -1..1).")
-                .append("torpedoRangeOffsets(-1..1, -3). torpedoRangeOffsets(-1..1, 3).")
-                .append("torpedoRangeOffsets(-4, 0). torpedoRangeOffsets(4, 0).")
-                .append("torpedoRangeOffsets(0, -4). torpedoRangeOffsets(0, 4).\n");
+                .append("torpedoRangeOffset(-2..2, -2..2).")
+                .append("torpedoRangeOffset(-3, -1..1). torpedoRangeOffset(3, -1..1).")
+                .append("torpedoRangeOffset(-1..1, -3). torpedoRangeOffset(-1..1, 3).")
+                .append("torpedoRangeOffset(-4, 0). torpedoRangeOffset(4, 0).")
+                .append("torpedoRangeOffset(0, -4). torpedoRangeOffset(0, 4).\n");
 
 
         this.aspHelper.immutableFacts = this.aspHelper.sb.toString();
@@ -360,7 +368,8 @@ public class ASPPlayer {
 
         // Detecting of Sonar Scan of Opponent Sector
         if (!this.stats.sonarResult.equals("NA"))
-            this.aspHelper.sb.append("oppSector(").append(this.stats.sonarResult).append("). ");
+            this.aspHelper.sb.append("opp").append((this.stats.sonarResult.equals("N") ? "No" : ""))
+                    .append("Sector(").append(this.stats.sectorAsked).append("). ");
 
         // Defining Opponent Offsets
         this.aspHelper.sb.append("oppVerticalOffset(").append(this.stats.opponentVerticalOffset).append("). ");
@@ -456,6 +465,13 @@ public class ASPPlayer {
                 this.stats.minedCells.remove(new MinedCell(triggerCommand.getRow(), triggerCommand.getColumn()));
 
             }
+            else if (command instanceof Sonar) {
+                Sonar sonarCommand = (Sonar) command;
+
+                // Saving Sector Asked for next Round
+                this.stats.sectorAsked = sonarCommand.getSectorAsked();
+
+            }
         }
     }
 
@@ -493,7 +509,7 @@ public class ASPPlayer {
         this.printInfoMessage("Choosing which action to execute");
 
         this.printInfoMessage("ASP Facts:");
-        this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
+        // this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
         this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
         List<ASPCommand> aspCommands = new ArrayList<>();
