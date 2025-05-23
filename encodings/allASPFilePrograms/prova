@@ -4,6 +4,7 @@
 
 %% waterCell(R, C) : cell[R][C] is water, you can move into it.
 %% visitedCell(R, C) : cell[R][C] in which you've moved into.
+%% minedCell(R, C) : cell[R][C] in which a Mine was placed.
 
 %% myPos(R, C) : current Position of the Player.
 
