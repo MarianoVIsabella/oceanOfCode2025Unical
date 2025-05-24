@@ -1,6 +1,6 @@
-%% -------------------------------------------------------------------------------
-%% --------------------------------- Input Facts ---------------------------------
-%% -------------------------------------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
+%% ---------------------------------------------------- Input Facts ----------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
 
 %% waterCell(R, C) : cell[R][C] is water, you can move into it.
 %% visitedCell(R, C) : cell[R][C] in which you've moved into.
@@ -16,7 +16,8 @@
 %% silenceCooldown(N) : current CoolDown Value of the Power Silence.
 %% mineCooldown(N) : current CoolDown Value of the Power Mine.
 
-%% oppOffsets(VO, HO) : current Vertical and Horizontal Offsets of the Opponent Player's Position relative to its initial one.
+%% oppVerticalOffset(VO) : current Vertical Offset of the Opponent Player's Position relative to its initial one.
+%% oppHorizontalOffset(HO) : current Horizontal Offsets of the Opponent Player's Position relative to its initial one.
 
 %% oppMove(T, D) : Opponent's last Move Command with Direction at time T.
 %% oppSurface(T, S) : Opponent's last Surface Command with Sector Index at time T.
@@ -32,9 +33,9 @@
 %% sector(S, CR, CC) : Defines Sectors of the Map, with Center Position (Row and Column).
 %% power(P) : Defines Power that can be used during the Game (noPower -> nil).
 
-%% -------------------------------------------------------------------------------
-%% -------------------------------- Output Facts ---------------------------------
-%% -------------------------------------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
+%% --------------------------------------------------- Output Facts ----------------------------------------------------
+%% ---------------------------------------------------------------------------------------------------------------------
 
 %% move(Time, Direction, ActivePower). [move/3] : Chosen Direction of the Player at time Time, with Power to Activate.
 %% ----- Time : [by actionSlot(Time)] (time ordering of the actions)
@@ -72,8 +73,7 @@
 
 waterCell(R, C) :- waterCell(R, C, S).
 oppVerticalOffset(N) :- oppOffsets(N, _).
-oppHorizontalOffset(N) : oppOffsets(_, N).
-
+oppHorizontalOffset(N) :- oppOffsets(_, N).
 
 %% Each time, the Player can choose between this set of Actions.
 moveAction(T) | surface(T) | firePower(T) | noAction(T) :- actionSlot(T).
