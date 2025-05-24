@@ -31,7 +31,6 @@
 %% direction(D, DR, DC) : Defines the Cardinal Directions as ASP Symbols with Offsets Position.
 %% sector(S, CR, CC) : Defines Sectors of the Map, with Center Position (Row and Column).
 %% power(P) : Defines Power that can be used during the Game (noPower -> nil).
-%% torpedoRangeOffset(DR, DC) : Defines Range Offsets from the Player's Position for the Torpedo Power.
 
 %% -------------------------------------------------------------------------------
 %% -------------------------------- Output Facts ---------------------------------

@@ -293,14 +293,14 @@ public class ASPPlayer {
                 .append("sectors(7, 12,2). sectors(8, 12,7). sectors(9, 12,12).\n")
 
                 // Defining Power that can be used during the Game
-                .append("power(torpedo). power(mine). power(trigger). powers(sonar). powers(nil).\n")
+                .append("power(torpedo). power(mine). power(trigger). powers(sonar). powers(nil).\n");
 
-                // Defining Torpedo Range Offsets
-                .append("torpedoRangeOffset(-2..2, -2..2).")
-                .append("torpedoRangeOffset(-3, -1..1). torpedoRangeOffset(3, -1..1).")
-                .append("torpedoRangeOffset(-1..1, -3). torpedoRangeOffset(-1..1, 3).")
-                .append("torpedoRangeOffset(-4, 0). torpedoRangeOffset(4, 0).")
-                .append("torpedoRangeOffset(0, -4). torpedoRangeOffset(0, 4).\n");
+//                // Defining Torpedo Range Offsets
+//                .append("torpedoRangeOffset(-2..2, -2..2).")
+//                .append("torpedoRangeOffset(-3, -1..1). torpedoRangeOffset(3, -1..1).")
+//                .append("torpedoRangeOffset(-1..1, -3). torpedoRangeOffset(-1..1, 3).")
+//                .append("torpedoRangeOffset(-4, 0). torpedoRangeOffset(4, 0).")
+//                .append("torpedoRangeOffset(0, -4). torpedoRangeOffset(0, 4).\n");
 
 
         this.aspHelper.immutableFacts = this.aspHelper.sb.toString();
