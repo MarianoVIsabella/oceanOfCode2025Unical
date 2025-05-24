@@ -48,7 +48,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 50;
+    protected int moveUntilEndCounter = 100;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -247,12 +247,12 @@ public class ASPPlayer {
                 .append("direction(n, -1,0). direction(s, 1,0). direction(w, 0,-1). direction(e, 0,1).\n")
 
                 // Defining Sectors of the Map, with Center Positions
-                .append("sector(1, 2,2). sectors(2, 2,7). sectors(3, 2,12).")
-                .append("sectors(4, 7,2). sectors(5, 7,7). sectors(6, 7,12).")
-                .append("sectors(7, 12,2). sectors(8, 12,7). sectors(9, 12,12).\n")
+                .append("sector(1, 2,2). sector(2, 2,7). sector(3, 2,12). ")
+                .append("sector(4, 7,2). sector(5, 7,7). sector(6, 7,12). ")
+                .append("sector(7, 12,2). sector(8, 12,7). sector(9, 12,12).\n")
 
                 // Defining Power that can be used during the Game
-                .append("power(torpedo). power(mine). power(trigger). powers(sonar). powers(nil).\n");
+                .append("power(torpedo). power(mine). power(trigger). power(sonar). power(nil).\n");
 
 //                // Defining Torpedo Range Offsets
 //                .append("torpedoRangeOffset(-2..2, -2..2).")
@@ -464,7 +464,7 @@ public class ASPPlayer {
     protected List<ASPCommand> chooseNextAction() {
         this.printInfoMessage("Choosing which action to execute");
 
-        this.printInfoMessage("ASP Facts:");
+        // this.printInfoMessage("ASP Facts:");
         // this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
         this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
