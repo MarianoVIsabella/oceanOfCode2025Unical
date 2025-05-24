@@ -372,8 +372,8 @@ public class ASPPlayer {
                     .append("Sector(").append(this.stats.sectorAsked).append("). ");
 
         // Defining Opponent Offsets
-        this.aspHelper.sb.append("oppVerticalOffset(").append(this.stats.opponentVerticalOffset).append("). ");
-        this.aspHelper.sb.append("oppHorizontalOffset(").append(this.stats.opponentHorizontalOffset).append(").\n");
+        this.aspHelper.sb.append("oppOffsets(").append(this.stats.opponentVerticalOffset).append(", ")
+                                              .append(this.stats.opponentHorizontalOffset).append(").\n");
 
         // Detecting of Opponent Action
         if (!this.stats.opponentOrders.equals("NA")) {
