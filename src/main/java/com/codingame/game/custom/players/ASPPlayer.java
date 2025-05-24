@@ -1,9 +1,12 @@
 package com.codingame.game.custom.players;
 
 import com.codingame.game.custom.ASPclasses.*;
+
+import com.codingame.game.custom.data.ASPHelper;
 import com.codingame.game.custom.data.MinedCell;
-import it.unical.mat.embasp.base.Handler;
-import it.unical.mat.embasp.base.InputProgram;
+import com.codingame.game.custom.data.Statistics;
+
+import it.unical.mat.embasp.base.OptionDescriptor;
 import it.unical.mat.embasp.base.Output;
 import it.unical.mat.embasp.languages.IllegalAnnotationException;
 import it.unical.mat.embasp.languages.ObjectNotValidException;
@@ -23,52 +26,6 @@ import java.util.stream.Collectors;
  ** It contains all the basic information to successfully compute a valid position to play the game
  **/
 public class ASPPlayer {
-
-    public static class Statistics {
-
-        // Current Player Stats
-        public int positionX = -1, positionY = -1;
-        public int myLifeValue = 6;
-        public List<MinedCell> minedCells;
-
-        // Opponent Player Stats
-        public int opponentLifeValue = 6;
-        public String opponentOrders = "NA";
-        public int opponentVerticalOffset = 0;
-        public int opponentHorizontalOffset = 0;
-
-        // Powers' Cooldown Values
-        public int torpedoCooldown = -1,
-                sonarCooldown = -1,
-                silenceCooldown = -1,
-                mineCooldown = -1;
-
-        // Powers' Results & Usage
-        public String sonarResult = "NA";
-        public int sectorAsked = -1;
-
-        public Statistics() {
-            this.minedCells = new ArrayList<>();
-        }
-    }
-
-    public static class ASPHelper {
-        // Path to ASP File to be executed
-        public String aspProgramPath = "encodings/allASPFilePrograms/prova";
-
-        // Types of Facts to be submitted to ASP Program
-        public String immutableFacts;
-        public String mutableFacts;
-
-        // ASP Handler
-        public Handler handler;
-
-        // Input Container for ASP Program
-        public InputProgram aspInputProgram;
-
-        public StringBuilder sb;
-
-    }
 
     // Grid Dimensions & Cells' info
     protected int gridWidth, gridHeight;
@@ -153,6 +110,8 @@ public class ASPPlayer {
         // Instancing Helping Classes
         this.aspHelper = new ASPHelper();
         this.stats = new Statistics();
+        this.randomGenerator = new Random();
+
 
         // Declaration of ASP Handler
         this.aspHelper.handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
@@ -320,8 +279,6 @@ public class ASPPlayer {
     }
 
     protected void prepareCurrentInternalState() {
-        // Declaring Random Generator to choose a Possible Answer if many
-        if (this.randomGenerator == null) this.randomGenerator = new Random();
 
         // Refreshing StringBuilder if not empty
         if (this.aspHelper.sb.length() > 0) this.aspHelper.sb.setLength(0);
@@ -490,12 +447,11 @@ public class ASPPlayer {
 //
 //        return List.of(7,7);
 
-        Random random = new Random();
         int possibleRow, possibleCol;
 
         while (true) {
-            possibleRow = random.nextInt(this.gridHeight);
-            possibleCol = random.nextInt(this.gridWidth);
+            possibleRow = this.randomGenerator.nextInt(this.gridHeight);
+            possibleCol = this.randomGenerator.nextInt(this.gridWidth);
 
             if (this.gridCells[possibleRow][possibleCol] == 0)
                 return List.of(possibleCol, possibleRow);
@@ -518,8 +474,8 @@ public class ASPPlayer {
         this.aspHelper.handler.removeAll();
 
         // Setting Options to get all possible AnswerSets
-//        OptionDescriptor allAnsSetOption = new OptionDescriptor("-n 0");
-//        this.aspHelper.handler.addOption(allAnsSetOption);
+        OptionDescriptor allAnsSetOption = new OptionDescriptor("-n 0");
+        this.aspHelper.handler.addOption(allAnsSetOption);
 
         // Adding Current Facts from Game Round
         if (!this.aspHelper.mutableFacts.isEmpty())
@@ -544,7 +500,7 @@ public class ASPPlayer {
         // List<AnswerSet> possibleSets = answerSets.getAnswersets();
 
         printInfoMessage("Number of Optimal Answer Sets: " + possibleSets.size());
-        AnswerSet a = possibleSets.get(0);
+        AnswerSet a = possibleSets.get(this.randomGenerator.nextInt(possibleSets.size()));
 
         try {
             for (Object obj : a.getAtoms()) {
