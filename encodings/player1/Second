@@ -1,13 +1,12 @@
 %% ASP Program for Player 1
 
-move(n) | move(s) | move(w) | move(e).
+{ move(1, Dir, nil) : direction(Dir, _,_) } = 1.
+{ surface(2) }.
 
-#show move/1.
+moveIntoCell(NewR, NewC) :- myPos(R, C), move(_, Dir, _), direction(Dir, DR,DC), NewR = R + DR, NewC = C + DC.
+water(R, C) :- waterCell(R, C, S).
 
-moveIntoCell(R-1, C) :- myPos(R, C), move(n).
-moveIntoCell(R+1, C) :- myPos(R, C), move(s).
-moveIntoCell(R, C-1) :- myPos(R, C), move(w).
-moveIntoCell(R, C+1) :- myPos(R, C), move(e).
-
-:- moveIntoCell(R, C), not waterCell(R, C).
+:- moveIntoCell(R, C), not water(R, C).
 :- moveIntoCell(R, C), visitedCell(R, C).
+
+:~ surface(T). [1@1, T]R, C), visitedCell(R, C).

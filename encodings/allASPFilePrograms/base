@@ -71,46 +71,13 @@
 #show trigger/3.
 #show sonar/2.
 
-waterCell(R, C) :- waterCell(R, C, S).
-oppVerticalOffset(N) :- oppOffsets(N, _).
-oppHorizontalOffset(N) :- oppOffsets(_, N).
+{ move(1, Dir, nil) : direction(Dir, _,_) } = 1.
+{ surface(2) }.
 
-%% Each time, the Player can choose between this set of Actions.
-moveAction(T) | surface(T) | firePower(T) | noAction(T) :- actionSlot(T).
-{ move(T, D) : directions(D) } = 1 :- moveAction(T).
-{ fireTorpedo(T) } = 1 :- firePower(T).
+moveIntoCell(NewR, NewC) :- myPos(R, C), move(_, Dir, _), direction(Dir, DR,DC), NewR = R + DR, NewC = C + DC.
+water(R, C) :- waterCell(R, C, S).
 
-%% No action can be made twice.
-:- surface(T1), surface(T2), T1 != T2.
-:- fireTorpedo(T1), fireTorpedo(T2), T1 != T2.
-:- moveAction(T1), moveAction(T2), T1 != T2.
-:- noAction(T1), not noAction(T2), T2 = T1 + 1, T2 <= 3.
-:- noAction(1).
+:- moveIntoCell(R, C), not water(R, C).
+:- moveIntoCell(R, C), visitedCell(R, C).
 
-%% Player's new Position
-moveIntoCell(R-1, C) :- myPos(R, C), move(_, n).
-moveIntoCell(R+1, C) :- myPos(R, C), move(_, s).
-moveIntoCell(R, C-1) :- myPos(R, C), move(_, w).
-moveIntoCell(R, C+1) :- myPos(R, C), move(_, e).
-
-%% Cannot move on islands or visited cells.
-%:- moveIntoCell(R, C), not waterCell(R, C).
-%:- moveIntoCell(R, C), visitedCell(R, C).
-
-%% If Move Action is chosen, a power can be charged.
-activeTorpedo(T)  :- move(T, _).
-powerActive(T) :- activeTorpedo(T).
-
-%% Translating moving and power charging in one predicate.
-move(T, D, nil) :- move(T, D), not powerActive(T).
-move(T, D, torpedo) :- move(T, D), activeTorpedo(T).
-
-%% Using some Power
-%torpedo(T, 1, 1) :- torpedoCooldown(0), fireTorpedo(T), myPos(R, C).
-%torpedo(T, 1, 1) :- torpedoCooldown(1), move(T1, _, torpedo), fireTorpedo(T), T1 < T, myPos(R, C).
-
-% :~ adessoPiango. [1@1]
-%:~ surface(T). [1@1]
-:~ actionSlot(T), not fireTorpedo(T). [1@2, T]
-
-:- fireTorpedo(_), torpedoCooldown(N), N > 1.
+:~ surface(T). [1@1, T]
