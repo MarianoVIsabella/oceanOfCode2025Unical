@@ -48,7 +48,7 @@ public class ASPPlayer {
     protected Random randomGenerator;
 
     // Temporary Variable to Block Program from going above Time Limit
-    protected int moveUntilEndCounter = 100;
+    protected int moveUntilEndCounter = 400;
 
     // Usage Settings
     // ---- GAME MODE: To be use when testing two ASP Programs one versus the other
@@ -437,16 +437,6 @@ public class ASPPlayer {
     // By Default, it gives back the first valid random cell it finds
     protected List<Integer> chooseInitialPosition() {
 
-//        // By Default, it prints the first valid cell it finds looking row by row
-//        for (int row = 0; row < this.gridHeight; row++) {
-//            for (int col = 0; col < this.gridWidth; col++)
-//                if (this.gridCells[row][col] == 0)
-//                    return List.of(col, row);
-//
-//        }
-//
-//        return List.of(7,7);
-
         int possibleRow, possibleCol;
 
         while (true) {
@@ -457,16 +447,11 @@ public class ASPPlayer {
                 return List.of(possibleCol, possibleRow);
         }
 
-        // return List.of();
     }
 
     // By Default, it tells to Move South and not to use any powers
     protected List<ASPCommand> chooseNextAction() {
         this.printInfoMessage("Choosing which action to execute");
-
-        // this.printInfoMessage("ASP Facts:");
-        // this.printInfoMessage("Immutable: " + this.aspHelper.immutableFacts);
-        this.printInfoMessage("Mutable: " + this.aspHelper.mutableFacts);
 
         List<ASPCommand> aspCommands = new ArrayList<>();
 
@@ -491,42 +476,24 @@ public class ASPPlayer {
         if (answerSets == null || answerSets.getAnswersets().isEmpty())
             return List.of(new Move(0,"S", "nil"));
 
-        for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
-        for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
+        // for (AnswerSet as: answerSets.getAnswersets()) printInfoMessage("Answer: " + as);
+        // for (AnswerSet as: answerSets.getOptimalAnswerSets()) printInfoMessage("Optimal: " + as);
 
         // Pick Optimal Answer Sets (If there isn't defined any, it throws an Exception)
         List<AnswerSet> possibleSets = answerSets.getOptimalAnswerSets();
         // If there isn't any weight on ASP Program, use this line
         // List<AnswerSet> possibleSets = answerSets.getAnswersets();
 
-        printInfoMessage("Number of Optimal Answer Sets: " + possibleSets.size());
         AnswerSet a = possibleSets.get(this.randomGenerator.nextInt(possibleSets.size()));
 
         try {
             for (Object obj : a.getAtoms()) {
-
-                if (obj instanceof ASPCommand) { aspCommands.add((ASPCommand) obj); }
-//                if (obj instanceof Move) {
-//                    Move move = (Move) obj;
-//                    // commands.add(move.toUpperString());
-//                    aspCommands.add(move);
-//                }
-//                else if (obj instanceof Torpedo) {
-//                    Torpedo torpedo = (Torpedo) obj;
-//                    // commands.add(torpedo.toUpperString());
-//                    aspCommands.add(torpedo);
-//                }
-//                else if (obj instanceof Surface) {
-//                    Surface surface = (Surface) obj;
-//                    // commands.add(surface.toUpperString());
-//                    aspCommands.add(surface);
-//                }
+                if (obj instanceof ASPCommand) {
+                    aspCommands.add((ASPCommand) obj);
+                }
             }
-            this.printInfoMessage("Commands from ASP: " + aspCommands);
         }
-        catch (Exception e) {
-            this.printInfoMessage("No command from ASP.");
-        }
+        catch (Exception e) { this.printInfoMessage("No command from ASP."); }
 
         this.printInfoMessage("ASP COMMANDS: " + aspCommands);
         if (!aspCommands.isEmpty())
@@ -548,7 +515,6 @@ public class ASPPlayer {
 
         for (int i = 1; i < actions.size(); i++)
             actionsToPrint.append(" | ").append(actions.get(i).toUpperString());
-
 
         System.out.println(actionsToPrint);
     }
