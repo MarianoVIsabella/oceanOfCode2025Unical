@@ -1,7 +1,7 @@
 # AI Competition - Ocean of Code
 #### Unical 2024/25, CdS Informatica III anno
 
-Shared Code of the AI Competition Project A.A. 2024-2025 based on the Game *Ocean of Codes* ([CodingGame - Ocean of Codes](https://www.codingame.com/contests/ocean-of-code)).
+Shared Code of the AI Competition Project A.A. 2024-2025 based on the Game *Ocean of Code* ([CodingGame - Ocean of Code](https://www.codingame.com/contests/ocean-of-code)).
 <br />
 Link to the [Official Repository](https://github.com/CodinGameCommunity/ocean-of-code) of the Game, developed by CodingGame, and to the [Official Page](https://www.codingame.com/ide/puzzle/ocean-of-code) of the Puzzle Game.
 <br />
