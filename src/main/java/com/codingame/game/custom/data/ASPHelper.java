@@ -5,7 +5,7 @@ import it.unical.mat.embasp.base.InputProgram;
 
 public class ASPHelper {
     // Path to ASP File to be executed
-    public String aspProgramPath = "encodings/allASPFilePrograms/prova";
+    public String aspProgramPath = "encodings/allASPFilePrograms/base";
 
     // Types of Facts to be submitted to ASP Program
     public String immutableFacts;
