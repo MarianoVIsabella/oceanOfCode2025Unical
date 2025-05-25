@@ -1,6 +1,4 @@
 import java.util.*;
-import java.io.*;
-import java.math.*;
 
 /**
  * Auto-generated code below aims at helping you parse
@@ -50,12 +48,8 @@ public class DummyPlayer {
             System.err.println(sonarResult);
             System.err.println(opponentOrders);
 
-            if (count < 3) { System.out.println("MOVE S TORPEDO"); }
-            else if (count < 6) { System.out.println("MOVE S MINE"); }
-            else if (count == 6) { System.out.println("SURFACE | MOVE S SILENCE | TORPEDO 7 9 | MOVE N");}
-            else { System.out.println("SURFACE"); }
+            System.out.println("MOVE N TORPEDO");
 
-            count++;
         }
     }
 }
