@@ -28,7 +28,7 @@
             <version>${gamengine.version}</version>
         </dependency>
 
-        <dependency>
+        <dependency>  <!-- CodingGame GameEngine - Unofficial, Personalized -->
             <groupId>com.codingame.gameengine</groupId>
             <artifactId>module-entities</artifactId>
             <version>${gamengine.version}</version>
